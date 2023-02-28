@@ -162,4 +162,9 @@ class HomeController extends Controller
             'data'              => $account
         ], 200);
     }
+
+    public function list()
+    {
+        return Account::all();
+    }
 }

@@ -30,6 +30,8 @@ Route::post('update/{id}',[HomeController::class,'update'])->name('update');
 
 Route::post('delete/{id}',[HomeController::class,'delete'])->name('delete');
 
+Route::get('list',[HomeController::class,'list'])->name('list');
+
 Route::get('show/{id}',[HomeController::class,'show'])->name('show');
 
 Route::post('insert',[HomeController::class,'insert'])->name('insert');
