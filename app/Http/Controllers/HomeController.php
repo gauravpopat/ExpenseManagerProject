@@ -22,8 +22,7 @@ class HomeController extends Controller
             'last_name'             => 'required',
             'email'                 => 'required | email | unique:users',
             'phone'                 => 'required|regex:/[6-9][0-9]{9}/ | unique:users',
-            'password'              => 'required | confirmed',
-            'password_confirmation' => 'required',
+            'password'              => 'required | confirmed |min:8',
         ]);
 
         //Validation Error
@@ -58,8 +57,7 @@ class HomeController extends Controller
         return response()->json([
             'status'            => true,
             'message'           => 'User Created Successfully',
-            'user_data'         => User::find($user),
-            'account_data'      => Account::find($account)
+            'user_data'         => User::find($user)
         ], 200);
     }
 
@@ -72,16 +70,18 @@ class HomeController extends Controller
             'password'              => 'required',
         ]);
 
-        if(Auth::attempt(['email'=>$request->email,'password'=>$request->password])){
+        // Checking user entered details
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             return response()->json([
                 'status'            => true,
                 'message'           => 'Login Successfully'
             ], 200);
         }
+
+        //If wrong details
         return response()->json([
             'status'            => false,
             'message'           => 'Login Failed! Try again...'
         ], 200);
-
     }
 }

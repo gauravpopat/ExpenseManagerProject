@@ -13,7 +13,7 @@
         Hello {{ $user['first_name'] }},
         Thank you for joining us...
         Here your accounts details:
-            <i>Account Name : </i>{{ $user['account_name'] }}
+            <i>Account Name   : </i>{{ $user['account_name'] }}
             <i>Account Number : </i>{{ $user['account_number'] }}
         Regards,
         {{ env('MAIL_FROM_NAME') }}
