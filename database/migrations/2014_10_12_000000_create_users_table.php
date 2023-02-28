@@ -25,6 +25,7 @@ return new class extends Migration
             $table->enum('role',['user','admin'])->default('user');
             $table->string('is_onboarded')->default(false);
             $table->timestamp('email_verified_at')->nullable();
+            $table->longText('email_verification_code')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

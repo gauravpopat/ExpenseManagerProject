@@ -26,6 +26,8 @@ class User extends Authenticatable
         // 'account_name',
         // 'account_number',
         'role',
+        'email_verification_code',
+        'is_onboarded'
     ];
 
     /**

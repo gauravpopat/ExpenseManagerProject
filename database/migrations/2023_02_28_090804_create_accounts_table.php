@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->unique();
             $table->string('account_name');
             $table->string('account_number')->unique();
             $table->boolean('is_default')->default(false);

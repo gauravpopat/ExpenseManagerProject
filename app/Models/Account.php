@@ -9,7 +9,7 @@ class Account extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'email',
+    
         'account_name',
         'account_number',
         'is_default',

@@ -20,5 +20,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/create',[HomeController::class,'create'])->name('create');
-Route::get('/verify',[HomeController::class,'verify'])->name('verify');
+Route::get('/verify/{email_verification_code}',[HomeController::class,'verify'])->name('verify');
 Route::post('/login',[HomeController::class,'login'])->name('login');
+
+
+//Crud For Account Table
+
+Route::post('update/{id}',[HomeController::class,'update'])->name('update');
+
+Route::post('delete/{id}',[HomeController::class,'delete'])->name('delete');
+
+Route::get('show/{id}',[HomeController::class,'show'])->name('show');
+
+Route::post('insert',[HomeController::class,'insert'])->name('insert');
