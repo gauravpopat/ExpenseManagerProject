@@ -20,4 +20,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/create',[HomeController::class,'create'])->name('create');
+Route::get('/verify',[HomeController::class,'verify'])->name('verify');
 Route::post('/login',[HomeController::class,'login'])->name('login');

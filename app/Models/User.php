@@ -23,8 +23,8 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
-        'account_name',
-        'account_number',
+        // 'account_name',
+        // 'account_number',
         'role',
     ];
 
@@ -46,9 +46,4 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-    public function account()
-    {
-        return $this->hasMany(Account::class);
-    }
 }

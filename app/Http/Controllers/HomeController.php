@@ -37,15 +37,15 @@ class HomeController extends Controller
             'email'             => $request->email,
             'phone'             => $request->phone,
             'password'          => Hash::make($request->password),
-            'account_name'      => $request->first_name . " " . $request->last_name,
-            'account_number'    => fake()->unique()->numerify('##########'),
+            // 'account_name'      => $request->first_name . " " . $request->last_name,
+            // 'account_number'    => fake()->unique()->numerify('##########'),
         ]);
 
         //Default Account
         $account = Account::create([
             'email'             => $user->email,
-            'account_name'      => $user->account_name,
-            'account_number'    => $user->account_number,
+            'account_name'      => $user->first_name." ".$user->last_name,
+            'account_number'    => fake()->unique()->numerify('##########'),
             'is_default'        => true,
             'user_id'           => $user->id
         ]);
@@ -83,5 +83,10 @@ class HomeController extends Controller
             'status'            => false,
             'message'           => 'Login Failed! Try again...'
         ], 200);
+    }
+
+    public function verify()
+    {
+        
     }
 }

@@ -15,6 +15,7 @@
         Here your accounts details:
             <i>Account Name   : </i>{{ $user['account_name'] }}
             <i>Account Number : </i>{{ $user['account_number'] }}
+            <i>URL : <a href="{{URL('/api/verify')}}">Click Here to Verify</a></i>
         Regards,
         {{ env('MAIL_FROM_NAME') }}
     </pre>

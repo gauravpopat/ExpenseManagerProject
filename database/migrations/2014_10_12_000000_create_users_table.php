@@ -20,9 +20,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->unique();
             $table->string('password');
-            $table->string('account_name');
-            $table->string('account_number')->unique();
+            // $table->string('account_name');
+            // $table->string('account_number')->unique();
             $table->enum('role',['user','admin'])->default('user');
+            $table->string('is_onboarded')->default(false);
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
