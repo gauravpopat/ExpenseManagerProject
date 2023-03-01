@@ -160,24 +160,33 @@ class HomeController extends Controller
     {
         $validationForAccount = Validator::make($request->all(), [
             'account_name'   => 'required',
-            'account_number' => 'required | numeric | unique:accounts'
+            'account_number' => 'required | numeric | unique:accounts',
+            'user_id'        => 'numeric | required | exists:users,id'
         ]);
 
         if ($validationForAccount->fails()) {
             return $validationForAccount->errors();
         }
 
-        $account = Account::create([
-            'account_name'      => $request->account_name,
-            'account_number'    => $request->account_number,
-            'user_id'           => 4
-        ]);
+        // $user = User::where('id',$request->user_id)->first();
+        // if($user){
+            $account = Account::create([
+                'account_name'      => $request->account_name,
+                'account_number'    => $request->account_number,
+                'user_id'           => $request->user_id
+            ]);
+    
+            return response()->json([
+                'status'            => true,
+                'message'           => 'Account Created Successfully',
+                'data'              => $account
+            ], 200);
+        // }
+        // else{
+        //     return "User Id Not Found";
+        // }
 
-        return response()->json([
-            'status'            => true,
-            'message'           => 'Account Created Successfully',
-            'data'              => $account
-        ], 200);
+        
     }
 
     public function list()
@@ -193,6 +202,7 @@ class HomeController extends Controller
             'first_name'            => 'required',
             'last_name'             => 'required',
             'email'                 => 'required | email | unique:users',
+            'account_id'            => 'numeric | required | exists:accounts,id'
         ]);
 
         //Validation Error
@@ -205,7 +215,7 @@ class HomeController extends Controller
             'first_name'        => $request->first_name,
             'last_name'         => $request->last_name,
             'email'             => $request->email,
-            'account_id'        => 1
+            'account_id'        => $request->account_id
         ]);
 
         return response()->json([
@@ -278,6 +288,8 @@ class HomeController extends Controller
             'type'                  => 'required | in:income,expense',
             'category'              => 'required',
             'amount'                => 'required | numeric',
+            'account_user_id'       => 'numeric | required | exists:account_users,id',
+            'account_id'            => 'numeric | required | exists:accounts,id'
         ]);
 
         //Validation Error
@@ -290,8 +302,8 @@ class HomeController extends Controller
             'type'              => $request->type,
             'category'          => $request->category,
             'amount'            => $request->amount,
-            'account_user_id'   => 1,
-            'account_id'        => 1,
+            'account_user_id'   => $request->account_user_id,
+            'account_id'        => $request->account_id,
         ]);
 
         return response()->json([
