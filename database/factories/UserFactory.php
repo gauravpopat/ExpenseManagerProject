@@ -25,6 +25,7 @@ class UserFactory extends Factory
             'email' => $fn.fake()->unique()->numberBetween(0,200)."@gmail.com",
             'phone' => fake()->unique()->numerify('##########'),
             'password' => fake()->unique()->password(),
+            'role' => 'admin',
             // 'account_name' => $fn." ".$ln,
             // 'account_number' => fake()->unique()->numerify('##########'),
             'email_verified_at' => null,
