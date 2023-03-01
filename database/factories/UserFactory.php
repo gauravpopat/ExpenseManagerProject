@@ -27,7 +27,7 @@ class UserFactory extends Factory
             'password' => fake()->unique()->password(),
             // 'account_name' => $fn." ".$ln,
             // 'account_number' => fake()->unique()->numerify('##########'),
-            'email_verified_at' => now(),
+            'email_verified_at' => null,
             'email_verification_code' => Str::random(40),
             'remember_token' => Str::random(10),
         ];

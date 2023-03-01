@@ -107,7 +107,8 @@ class HomeController extends Controller
 
         $user = User::where('email_verification_code', $verificaton_code)->first();
         $user->update([
-            'is_onboarded' => true
+            'is_onboarded' => true,
+            'email_verified_at' => now()
         ]);
         return "Verification Successfull";
     }
