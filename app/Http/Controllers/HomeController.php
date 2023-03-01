@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ResetPassword;
 use App\Mail\WelcomeMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -10,9 +11,11 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Account;
 use App\Models\AccountUser;
 use App\Models\Transaction;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use League\CommonMark\Extension\SmartPunct\EllipsesParser;
 
 class HomeController extends Controller
 {
@@ -60,6 +63,7 @@ class HomeController extends Controller
         return response()->json([
             'status'            => true,
             'message'           => 'User Created Successfully',
+            'token'             => $user->createToken("API TOKEN")->plainTextToken,
             'user_data'         => User::find($user)
         ], 200);
     }
@@ -75,9 +79,11 @@ class HomeController extends Controller
 
         // Checking user entered details
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            $user = User::where('email',$request->email)->first();
             return response()->json([
                 'status'            => true,
-                'message'           => 'Login Successfully'
+                'message'           => 'Login Successfully',
+                'token'             => $user->createToken("API TOKEN")->plainTextToken
             ], 200);
         }
 
@@ -87,6 +93,8 @@ class HomeController extends Controller
             'message'           => 'Login Failed! Try again...'
         ], 200);
     }
+
+    
 
     public function verify($verificaton_code)
     {
@@ -339,5 +347,51 @@ class HomeController extends Controller
     public function tshow($id)
     {
         return Transaction::find($id);
+    }
+
+    public function forgotpassword(Request $request)
+    {
+        //Validation
+        $validate = Validator::make($request->all(), [
+            'email'  => 'required | email'
+        ]);
+
+        //Validation Error
+        if ($validate->fails()) {
+            return $validate->errors();
+        }
+
+        $user = User::where('email', $request->email)->first();
+        if($user){
+            Mail::to($user->email)->send(new ResetPassword($user));
+            return "Mail Sent! Check it";
+        }else{
+            return "This email not in the database";
+        }
+    }
+
+    public function forgotpw(Request $request)
+    {
+        //Validation
+        $validate = Validator::make($request->all(), [
+            'password' => 'required | confirmed |min:8',
+            'password_confirmation' => 'required',
+            'token' => 'required'
+        ]);
+
+        //Validation Error
+        if ($validate->fails()) {
+            return $validate->errors();
+        }
+
+        $user = User::where('email_verification_code',$request->token)->first();
+        if($user){
+            $user->update([
+                'password' => Hash::make($request->password),
+            ]);
+            return $user->email;
+        }else{
+            return "Token Not Valid";
+        }
     }
 }
