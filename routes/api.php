@@ -67,3 +67,6 @@ Route::get('tlist',[HomeController::class,'tList'])->name('tlist')->middleware('
 
 Route::get('tshow/{id}',[HomeController::class,'tShow'])->name('tshow')->middleware('auth:sanctum');
 
+
+Route::get('userprofile/{id}',[HomeController::class,'userProfile'])->middleware('auth:sanctum');
+

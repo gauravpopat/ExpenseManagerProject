@@ -15,4 +15,9 @@ class Account extends Model
         'is_default',
         'user_id'
     ];
+
+    public function account()
+    {
+        return $this->hasMany(Account::class);
+    }
 }

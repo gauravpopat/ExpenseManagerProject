@@ -439,4 +439,14 @@ class HomeController extends Controller
             return "Old Password Not Matched";
         }
     }
+
+
+    public function userProfile($id)
+    {
+        return response()->json([
+            'message' => 'User Detail',
+            'User' => User::find($id),
+            'User Account' => User::find($id)->account
+        ]);
+    }
 }
