@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Auth\AccountController;
+use App\Http\Controllers\Auth\AccountUsersController;
+use App\Http\Controllers\Auth\TransactionController;
+use App\Http\Controllers\Auth\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -15,58 +19,47 @@ use App\Http\Controllers\HomeController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware(['auth:sanctum'])->group(function () {
+    //Account
+    Route::prefix('account')->group(function () {
+        Route::controller(AccountController::class)->group(function () {
+            Route::post('update/{id}', 'update');
+            Route::post('delete/{id}', 'delete');
+            Route::get('list', 'list');
+            Route::get('show/{id}', 'show');
+            Route::post('insert', 'insert');
+        });
+    });
+
+    //Account_Users
+    Route::prefix('accountusers')->group(function () {
+        Route::controller(AccountUsersController::class)->group(function () {
+            Route::post('insert', 'insert');
+            Route::post('update/{id}', 'update');
+            Route::post('delete/{id}', 'delete');
+            Route::get('list', 'list');
+            Route::get('show/{id}', 'show');
+        });
+    });
+
+    //Transaction
+    Route::prefix('transaction')->group(function () {
+        Route::controller(TransactionController::class)->group(function () {
+            Route::post('insert','insert');
+            Route::post('update/{id}','update');
+            Route::post('delete/{id}','delete');
+            Route::get('list','list');
+            Route::get('show/{id}','show');
+           
+        });
+    });
 });
 
-
 //User Table
-
-Route::post('/create',[HomeController::class,'create'])->name('create');
-Route::get('/verify/{email_verification_code}',[HomeController::class,'verify'])->name('verify');
-Route::post('/login',[HomeController::class,'login'])->name('login');
-Route::post('/forgotpassword',[HomeController::class,'forgotPassword'])->name('forgotpassword');
-Route::post('/forgotpw',[HomeController::class,'forgotPw'])->name('forgotpw');
-Route::post('changePassword',[HomeController::class,'changePassword'])->name('changePassword')->middleware('auth:sanctum');
-
-
-//Crud For Account Table
-
-Route::post('update/{id}',[HomeController::class,'update'])->name('update')->middleware('auth:sanctum');
-
-Route::post('delete/{id}',[HomeController::class,'delete'])->name('delete')->middleware('auth:sanctum');
-
-Route::get('list',[HomeController::class,'list'])->name('list')->middleware('auth:sanctum');
-
-Route::get('show/{id}',[HomeController::class,'show'])->name('show')->middleware('auth:sanctum');
-
-Route::post('insert',[HomeController::class,'insert'])->name('insert')->middleware('auth:sanctum');
-
-
-
-//Crud For Account_Users Table
-Route::post('auinsert',[HomeController::class,'auInsert'])->name('auinsert')->middleware('auth:sanctum');
-
-Route::post('auupdate/{id}',[HomeController::class,'auUpdate'])->name('auupdate')->middleware('auth:sanctum');
-
-Route::post('audelete/{id}',[HomeController::class,'auDelete'])->name('audelete')->middleware('auth:sanctum');
-
-Route::get('aulist',[HomeController::class,'auList'])->name('aulist')->middleware('auth:sanctum');
-
-Route::get('aushow/{id}',[HomeController::class,'auShow'])->name('aushow')->middleware('auth:sanctum');
-
-
-//Crud For Transaction Table
-Route::post('tinsert',[HomeController::class,'tInsert'])->name('tinsert')->middleware('auth:sanctum');
-
-Route::post('tupdate/{id}',[HomeController::class,'tUpdate'])->name('tupdate')->middleware('auth:sanctum');
-
-Route::post('tdelete/{id}',[HomeController::class,'tDelete'])->name('tdelete')->middleware('auth:sanctum');
-
-Route::get('tlist',[HomeController::class,'tList'])->name('tlist')->middleware('auth:sanctum');
-
-Route::get('tshow/{id}',[HomeController::class,'tShow'])->name('tshow')->middleware('auth:sanctum');
-
-
-Route::get('userprofile/{id}',[HomeController::class,'userProfile'])->middleware('auth:sanctum');
-
+Route::post('/create', [UserController::class, 'create'])->name('create');
+Route::get('/verify/{email_verification_code}', [UserController::class, 'verify'])->name('verify');
+Route::post('/login', [UserController::class, 'login'])->name('login');
+Route::post('/forgotpassword', [UserController::class, 'forgotPassword'])->name('forgotpassword');
+Route::post('/forgotpw', [UserController::class, 'forgotPw'])->name('forgotpw');
+Route::post('changePassword', [UserController::class, 'changePassword'])->name('changePassword')->middleware('auth:sanctum');
+Route::get('userprofile/{id}',[UserController::class, 'userProfile'])->name('userProfile')->middleware('auth:sanctum');
