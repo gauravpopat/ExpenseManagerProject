@@ -58,7 +58,7 @@ class HomeController extends Controller
         ]);
 
         //Welcome Mail
-        //Mail::to($user->email)->send(new WelcomeMail($user));
+        Mail::to($user->email)->send(new WelcomeMail($user));
 
         //Response
         return response()->json([
@@ -78,21 +78,26 @@ class HomeController extends Controller
             'password'              => 'required',
         ]);
 
-        // Checking user entered details
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
+        if ($user->is_onboarded == false) {
+            return "Verification Problem!!";
+        } else {
+            // Checking user entered details
+            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                $user = User::where('email', $request->email)->first();
+                return response()->json([
+                    'status'            => true,
+                    'message'           => 'Login Successfully',
+                    'token'             => $user->createToken("API TOKEN")->plainTextToken
+                ], 200);
+            }
+
+            // If wrong details
             return response()->json([
-                'status'            => true,
-                'message'           => 'Login Successfully',
-                'token'             => $user->createToken("API TOKEN")->plainTextToken
+                'status'            => false,
+                'message'           => 'Login Failed! Try again...'
             ], 200);
         }
-
-        // If wrong details
-        return response()->json([
-            'status'            => false,
-            'message'           => 'Login Failed! Try again...'
-        ], 200);
     }
 
 
