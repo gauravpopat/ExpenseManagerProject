@@ -44,6 +44,7 @@ class HomeController extends Controller
             'phone'             => $request->phone,
             'password'          => Hash::make($request->password),
             'email_verification_code' =>  Str::random(40),
+            'remember_token' => Str::random(10),
             // 'account_name'      => $request->first_name . " " . $request->last_name,
             // 'account_number'    => fake()->unique()->numerify('##########'),
         ]);
@@ -57,7 +58,7 @@ class HomeController extends Controller
         ]);
 
         //Welcome Mail
-        Mail::to($user->email)->send(new WelcomeMail($user));
+        //Mail::to($user->email)->send(new WelcomeMail($user));
 
         //Response
         return response()->json([
@@ -79,7 +80,7 @@ class HomeController extends Controller
 
         // Checking user entered details
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            $user = User::where('email',$request->email)->first();
+            $user = User::where('email', $request->email)->first();
             return response()->json([
                 'status'            => true,
                 'message'           => 'Login Successfully',
@@ -87,14 +88,14 @@ class HomeController extends Controller
             ], 200);
         }
 
-        //If wrong details
+        // If wrong details
         return response()->json([
             'status'            => false,
             'message'           => 'Login Failed! Try again...'
         ], 200);
     }
 
-    
+
 
     public function verify($verificaton_code)
     {
@@ -208,8 +209,8 @@ class HomeController extends Controller
         ], 200);
     }
 
-   // Account_Users Update
-   public function auUpdate($id, Request $request)
+    // Account_Users Update
+    public function auUpdate($id, Request $request)
     {
         $account_users = AccountUser::find($id);
 
@@ -362,10 +363,10 @@ class HomeController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
-        if($user){
+        if ($user) {
             Mail::to($user->email)->send(new ResetPassword($user));
             return "Mail Sent! Check it";
-        }else{
+        } else {
             return "This email not in the database";
         }
     }
@@ -384,13 +385,13 @@ class HomeController extends Controller
             return $validate->errors();
         }
 
-        $user = User::where('email_verification_code',$request->token)->first();
-        if($user){
+        $user = User::where('email_verification_code', $request->token)->first();
+        if ($user) {
             $user->update([
                 'password' => Hash::make($request->password),
             ]);
             return $user->email;
-        }else{
+        } else {
             return "Token Not Valid";
         }
     }
@@ -399,6 +400,7 @@ class HomeController extends Controller
     {
         //Validaton
         $validate = Validator::make($request->all(), [
+            'old_password' => 'required',
             'password' => 'required | confirmed |min:8',
             'password_confirmation' => 'required'
         ]);
@@ -408,12 +410,15 @@ class HomeController extends Controller
             return $validate->errors();
         }
 
-        $user = User::where('id',Auth::user()->id)->first();
-        $user->update([
-            'password' => Hash::make($request->password)
-        ]);
-        return "Dear user ".Auth::user()->first_name.", Password Changed Successfully";
 
-
+        $user = User::where('id', Auth::user()->id)->first();
+        if (Hash::check($request->old_password, $user->password)) {
+            $user->update([
+                'password' => Hash::make($request->password)
+            ]);
+            return "Dear user " . Auth::user()->first_name . ", Password Changed Successfully";
+        } else {
+            return "Old Password Not Matched";
+        }
     }
 }
