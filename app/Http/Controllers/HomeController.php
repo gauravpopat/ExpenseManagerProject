@@ -57,7 +57,7 @@ class HomeController extends Controller
         ]);
 
         //Welcome Mail
-        //Mail::to($user->email)->send(new WelcomeMail($user));
+        Mail::to($user->email)->send(new WelcomeMail($user));
 
         //Response
         return response()->json([
