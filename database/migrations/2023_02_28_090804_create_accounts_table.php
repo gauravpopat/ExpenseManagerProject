@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('account_number')->unique();
             $table->boolean('is_default')->default(false);
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     } 

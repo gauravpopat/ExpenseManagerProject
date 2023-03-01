@@ -35,3 +35,29 @@ Route::get('list',[HomeController::class,'list'])->name('list');
 Route::get('show/{id}',[HomeController::class,'show'])->name('show');
 
 Route::post('insert',[HomeController::class,'insert'])->name('insert');
+
+
+
+//Crud For Account_Users Table
+Route::post('auinsert',[HomeController::class,'auinsert'])->name('auinsert');
+
+Route::post('auupdate/{id}',[HomeController::class,'auupdate'])->name('auupdate');
+
+Route::post('audelete/{id}',[HomeController::class,'audelete'])->name('audelete');
+
+Route::get('aulist',[HomeController::class,'aulist'])->name('aulist');
+
+Route::get('aushow/{id}',[HomeController::class,'aushow'])->name('aushow');
+
+
+//Crud For Transaction Table
+Route::post('tinsert',[HomeController::class,'tinsert'])->name('tinsert');
+
+Route::post('tupdate/{id}',[HomeController::class,'tupdate'])->name('tupdate');
+
+Route::post('tdelete/{id}',[HomeController::class,'tdelete'])->name('tdelete');
+
+Route::get('tlist',[HomeController::class,'tlist'])->name('tlist');
+
+Route::get('tshow/{id}',[HomeController::class,'tshow'])->name('tshow');
+
