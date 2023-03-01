@@ -179,7 +179,7 @@ class HomeController extends Controller
     }
 
     //Account_Users Insert
-    public function auinsert(Request $request)
+    public function auInsert(Request $request)
     {
         //Validation
         $validate = Validator::make($request->all(), [
@@ -209,7 +209,7 @@ class HomeController extends Controller
     }
 
    // Account_Users Update
-   public function auupdate($id, Request $request)
+   public function auUpdate($id, Request $request)
     {
         $account_users = AccountUser::find($id);
 
@@ -242,7 +242,7 @@ class HomeController extends Controller
     }
 
     // Account_Users Delete Record
-    public function audelete($id)
+    public function auDelete($id)
     {
         $account_users = AccountUser::find($id);
         $account_users->delete();
@@ -250,13 +250,13 @@ class HomeController extends Controller
     }
 
     //Get list of Account_Users Table Records
-    public function aulist()
+    public function auList()
     {
         return AccountUser::all();
     }
 
     //Get Record from ID
-    public function aushow($id)
+    public function auShow($id)
     {
         return AccountUser::find($id);
     }
@@ -264,7 +264,7 @@ class HomeController extends Controller
     //Transaction CRUD
 
     //Insert
-    public function tinsert(Request $request)
+    public function tInsert(Request $request)
     {
         //Validation
         $validate = Validator::make($request->all(), [
@@ -296,7 +296,7 @@ class HomeController extends Controller
 
 
     //Update
-    public function tupdate($id, Request $request)
+    public function tUpdate($id, Request $request)
     {
         $transaction = Transaction::find($id);
 
@@ -329,7 +329,7 @@ class HomeController extends Controller
     }
 
     //Delete record from transaction
-    public function tdelete($id)
+    public function tDelete($id)
     {
         $transaction = Transaction::find($id);
         $transaction->delete();
@@ -338,18 +338,18 @@ class HomeController extends Controller
 
 
     //Get list of Transaction Table Records
-    public function tlist()
+    public function tList()
     {
         return Transaction::all();
     }
 
     //Get Record from ID
-    public function tshow($id)
+    public function tShow($id)
     {
         return Transaction::find($id);
     }
 
-    public function forgotpassword(Request $request)
+    public function forgotPassword(Request $request)
     {
         //Validation
         $validate = Validator::make($request->all(), [
@@ -370,7 +370,7 @@ class HomeController extends Controller
         }
     }
 
-    public function forgotpw(Request $request)
+    public function forgotPw(Request $request)
     {
         //Validation
         $validate = Validator::make($request->all(), [
@@ -393,5 +393,27 @@ class HomeController extends Controller
         }else{
             return "Token Not Valid";
         }
+    }
+
+    public function changePassword(Request $request)
+    {
+        //Validaton
+        $validate = Validator::make($request->all(), [
+            'password' => 'required | confirmed |min:8',
+            'password_confirmation' => 'required'
+        ]);
+
+        //Validation Error
+        if ($validate->fails()) {
+            return $validate->errors();
+        }
+
+        $user = User::where('id',Auth::user()->id)->first();
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+        return "Dear user ".Auth::user()->first_name.", Password Changed Successfully";
+
+
     }
 }

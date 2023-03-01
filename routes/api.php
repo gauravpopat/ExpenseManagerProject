@@ -25,8 +25,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/create',[HomeController::class,'create'])->name('create');
 Route::get('/verify/{email_verification_code}',[HomeController::class,'verify'])->name('verify');
 Route::post('/login',[HomeController::class,'login'])->name('login');
-Route::post('/forgotpassword',[HomeController::class,'forgotpassword'])->name('forgotpassword');
-Route::post('/forgotpw',[HomeController::class,'forgotpw'])->name('forgotpw');
+Route::post('/forgotpassword',[HomeController::class,'forgotPassword'])->name('forgotpassword');
+Route::post('/forgotpw',[HomeController::class,'forgotPw'])->name('forgotpw');
+Route::post('changePassword',[HomeController::class,'changePassword'])->name('changePassword')->middleware('auth:sanctum');
 
 
 //Crud For Account Table
@@ -44,25 +45,25 @@ Route::post('insert',[HomeController::class,'insert'])->name('insert')->middlewa
 
 
 //Crud For Account_Users Table
-Route::post('auinsert',[HomeController::class,'auinsert'])->name('auinsert')->middleware('auth:sanctum');
+Route::post('auinsert',[HomeController::class,'auInsert'])->name('auinsert')->middleware('auth:sanctum');
 
-Route::post('auupdate/{id}',[HomeController::class,'auupdate'])->name('auupdate')->middleware('auth:sanctum');
+Route::post('auupdate/{id}',[HomeController::class,'auUpdate'])->name('auupdate')->middleware('auth:sanctum');
 
-Route::post('audelete/{id}',[HomeController::class,'audelete'])->name('audelete')->middleware('auth:sanctum');
+Route::post('audelete/{id}',[HomeController::class,'auDelete'])->name('audelete')->middleware('auth:sanctum');
 
-Route::get('aulist',[HomeController::class,'aulist'])->name('aulist')->middleware('auth:sanctum');
+Route::get('aulist',[HomeController::class,'auList'])->name('aulist')->middleware('auth:sanctum');
 
-Route::get('aushow/{id}',[HomeController::class,'aushow'])->name('aushow')->middleware('auth:sanctum');
+Route::get('aushow/{id}',[HomeController::class,'auShow'])->name('aushow')->middleware('auth:sanctum');
 
 
 //Crud For Transaction Table
-Route::post('tinsert',[HomeController::class,'tinsert'])->name('tinsert')->middleware('auth:sanctum');
+Route::post('tinsert',[HomeController::class,'tInsert'])->name('tinsert')->middleware('auth:sanctum');
 
-Route::post('tupdate/{id}',[HomeController::class,'tupdate'])->name('tupdate')->middleware('auth:sanctum');
+Route::post('tupdate/{id}',[HomeController::class,'tUpdate'])->name('tupdate')->middleware('auth:sanctum');
 
-Route::post('tdelete/{id}',[HomeController::class,'tdelete'])->name('tdelete')->middleware('auth:sanctum');
+Route::post('tdelete/{id}',[HomeController::class,'tDelete'])->name('tdelete')->middleware('auth:sanctum');
 
-Route::get('tlist',[HomeController::class,'tlist'])->name('tlist')->middleware('auth:sanctum');
+Route::get('tlist',[HomeController::class,'tList'])->name('tlist')->middleware('auth:sanctum');
 
-Route::get('tshow/{id}',[HomeController::class,'tshow'])->name('tshow')->middleware('auth:sanctum');
+Route::get('tshow/{id}',[HomeController::class,'tShow'])->name('tshow')->middleware('auth:sanctum');
 
