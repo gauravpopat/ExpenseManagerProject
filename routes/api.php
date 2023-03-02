@@ -38,7 +38,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('show/{id}', 'show');
         });
 
-    //Transaction
+    // Transaction
         Route::controller(TransactionController::class)->prefix('transaction')->group(function () {
             Route::post('insert','insert');
             Route::post('update/{id}','update');
