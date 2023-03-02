@@ -28,7 +28,7 @@ class Account extends Model
 
     public function transaction()
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasMany(Transaction::class)->orderBy('created_at',"DESC");
     }
 
 }

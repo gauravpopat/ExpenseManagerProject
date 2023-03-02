@@ -52,7 +52,16 @@ class AuthController extends Controller
         $user  = User::with('account','userOfAccount','transactions')->findOrFail($id);
         return response()->json([
             'message'           => 'User Profile',
-            'data'              => $user,
+            'User Data'         => $user,
+        ]);
+    }
+
+    public function accountDetails($id)
+    {
+        $account = Account::with('transaction')->findOrFail($id);
+        return response()->json([
+            'message'           => 'Account Details',
+            'Account Data'      => $account
         ]);
     }
 }
