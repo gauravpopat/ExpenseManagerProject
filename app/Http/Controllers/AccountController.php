@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Account;
 use Illuminate\Support\Facades\Validator;
+use League\CommonMark\Extension\SmartPunct\EllipsesParser;
 
 class AccountController extends Controller
 {
     public function update($id, Request $request)
     {
-        $account = Account::findOrFail($id);
         $validationForAccount = Validator::make($request->all(), [
             'account_name'   => 'required|max:40|alpha',
             'account_number' => 'required|numeric|unique:accounts,account_number',
@@ -24,20 +24,26 @@ class AccountController extends Controller
                 'error'     => $validationForAccount->errors()
             ]);
         }
-        $account->update($request->only(['account_name', 'account_number']));
-        return response()->json([
-            'status'    => true,
-            'message'   => 'Data Updated Successfully',
-        ]);
+
+        $account = Account::findOrFail($id);
+        if ($account) {
+            $account->update($request->only(['account_name', 'account_number']));
+            return response()->json([
+                'status'    => true,
+                'message'   => 'Record Updated Successfully',
+            ]);
+        } else {
+            return response()->json([
+                'status'    => false,
+                'message'   => 'Record Not Found!',
+            ]);
+        }
     }
 
     public function delete($id)
     {
-
         $account = Account::findOrFail($id);
-
         if ($account) {
-
             if ($account->is_default == true) {
                 return response()->json([
                     'status'    => false,
@@ -50,8 +56,7 @@ class AccountController extends Controller
                     'message'   => 'Account Deleted Successfully...'
                 ]);
             }
-        }
-        else{
+        } else {
             return response()->json([
                 'status'    => false,
                 'message'   => 'No Account Found'
@@ -61,9 +66,10 @@ class AccountController extends Controller
 
     public function show($id)
     {
+        $account = Account::findOrFail($id);
         return response()->json([
             'message'   => 'Data',
-            'data'      => Account::findOrFail($id)
+            'accounts'      => $account
         ]);
     }
 
@@ -76,10 +82,11 @@ class AccountController extends Controller
         ]);
 
         if ($validationForAccount->fails()) {
+            $errors = $validationForAccount->errors();
             return response()->json([
                 'status'     => false,
                 'message'    => 'Validation Error',
-                'error'      => $validationForAccount->errors()
+                'errors'     => $errors
             ]);
         }
 
@@ -88,16 +95,16 @@ class AccountController extends Controller
         return response()->json([
             'status'         => true,
             'message'        => 'Account Created Successfully',
-            'data'           => $account
+            'account'           => $account
         ], 200);
     }
 
     public function list()
     {
-        $account = Account::all();
+        $accounts = Account::all();
         return response()->json([
             'message'   => 'Data',
-            'data'      => $account
+            'data'      => $accounts
         ]);
     }
 }
