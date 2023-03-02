@@ -46,7 +46,7 @@ class TransactionController extends Controller
     {
         $transaction = Transaction::find($id);
         if ($transaction) {
-            Transaction::findOrFail($id)->update($request->only('type', 'category', 'amount'));
+            Transaction::find($id)->update($request->only('type', 'category', 'amount'));
             return response()->json([
                 'status'   => true,
                 'message'  => 'Data Updated Successfully',
@@ -64,7 +64,7 @@ class TransactionController extends Controller
     {
         $transaction = Transaction::find($id);
         if ($transaction) {
-            Transaction::findOrFail($id)->delete();
+            Transaction::find($id)->delete();
             return response()->json([
                 'status'    => true,
                 'message'   => 'Transaction Deleted Successfully',
@@ -92,7 +92,7 @@ class TransactionController extends Controller
     {
         $getTransaction = Transaction::find($id);
         if($getTransaction){
-            $transaction = Transaction::findOrFail($id);
+            $transaction = Transaction::find($id);
             return response()->json([
                 'message'   => 'Transaction',
                 'data'      => $transaction

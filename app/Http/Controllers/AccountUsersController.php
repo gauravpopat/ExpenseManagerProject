@@ -82,7 +82,7 @@ class AccountUsersController extends Controller
     {
         $user = AccountUser::find($id);
         if ($user) {
-            AccountUser::findOrFail($id)->delete();
+            AccountUser::find($id)->delete();
             return response()->json([
                 'status'  => true,
                 'message' => 'Account User deleted successfully',
@@ -108,7 +108,7 @@ class AccountUsersController extends Controller
     //Get Record from ID
     public function show($id)
     {
-        $accountUser = AccountUser::findOrFail($id);
+        $accountUser = AccountUser::find($id);
         if ($accountUser) {
             return response()->json([
                 'message'   => 'Account User',

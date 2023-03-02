@@ -25,7 +25,7 @@ class AccountController extends Controller
             ]);
         }
 
-        $account = Account::findOrFail($id);
+        $account = Account::find($id);
         if ($account) {
             $account->update($request->only(['account_name', 'account_number']));
             return response()->json([
@@ -42,7 +42,7 @@ class AccountController extends Controller
 
     public function delete($id)
     {
-        $account = Account::findOrFail($id);
+        $account = Account::find($id);
         if ($account) {
             if ($account->is_default == true) {
                 return response()->json([
@@ -66,11 +66,19 @@ class AccountController extends Controller
 
     public function show($id)
     {
-        $account = Account::findOrFail($id);
-        return response()->json([
-            'message'   => 'Data',
-            'accounts'      => $account
-        ]);
+        $account = Account::find($id);
+        if($account){
+            return response()->json([
+                'message'   => 'Data',
+                'accounts'      => $account
+            ]);
+        }
+        else{
+            return response()->json([
+                'message'   => 'Account not found',
+            ]);
+        }
+        
     }
 
     public function insert(Request $request)

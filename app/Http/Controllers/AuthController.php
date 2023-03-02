@@ -70,7 +70,7 @@ class AuthController extends Controller
     {
         $account = Account::find($id);
         if ($account) {
-            $accountDetails = Account::with('transactions')->findOrFail($id);
+            $accountDetails = Account::with('transactions')->find($id);
             return response()->json([
                 'message'           => 'Account Details',
                 'Account Data'      => $accountDetails
