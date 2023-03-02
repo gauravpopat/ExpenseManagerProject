@@ -15,12 +15,15 @@ return new class extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
-            $table->string('account_name');
+            $table->unsignedBigInteger('user_id');
+
+            $table->string('account_name','40');
             $table->string('account_number')->unique();
             $table->boolean('is_default')->default(false);
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
+            
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            
         });
     } 
     /**

@@ -15,24 +15,21 @@ class AccountUsersController extends Controller
     {
         //Validation
         $validate = Validator::make($request->all(), [
-            'first_name'            => 'required',
-            'last_name'             => 'required',
+            'first_name'            => 'required | max:40',
+            'last_name'             => 'required | max:40',
             'email'                 => 'required | email | unique:users',
             'account_id'            => 'numeric | required | exists:accounts,id'
         ]);
 
         //Validation Error
         if ($validate->fails()) {
-            return $validate->errors();
+            return response()->json([
+                'status'    => false,
+                'message'   => 'Validation Error',
+                'error'     => $validate->errors()
+            ]);
         }
-
-        //Insert
-        $account_users = AccountUser::create([
-            'first_name'        => $request->first_name,
-            'last_name'         => $request->last_name,
-            'email'             => $request->email,
-            'account_id'        => $request->account_id
-        ]);
+        $account_users = AccountUser::create($request->only(['first_name','last_name','email','account_id']));
 
         return response()->json([
             'status'            => true,
@@ -44,54 +41,56 @@ class AccountUsersController extends Controller
     // Account_Users Update
     public function update($id, Request $request)
     {
-        $account_users = AccountUser::find($id);
-
-        // If request is null then it will store the old value in update otherwise new value(req value)
-
-        if ($request->first_name == null) {
-            $first_name = $account_users->first_name;
-        } else {
-            $first_name = $request->first_name;
-        }
-
-        if ($request->last_name == null) {
-            $last_name = $account_users->last_name;
-        } else {
-            $last_name = $request->last_name;
-        }
-
-        if ($request->email == null) {
-            $email = $account_users->email;
-        } else {
-            $email = $request->email;
-        }
-
-        $account_users->update([
-            'first_name'   => $first_name,
-            'last_name'    => $last_name,
-            'email'        => $email
+        $account_users = AccountUser::findOrFail($id);
+        $validationForAccount = Validator::make($request->all(), [
+            'first_name'   => 'required | max:40',
+            'last_name'    => 'required | max:40',
+            'email'        => 'required | email | unique:account_users,email'
         ]);
-        return $account_users;
+
+        //Validation Error
+        if ($validationForAccount->fails()) {
+            return response()->json([
+                'status'    => false,
+                'message'   => 'Validation Error',
+                'error'     => $validationForAccount->errors()
+            ]);
+        }
+
+        $account_users->update($request->only(['first_name','last_name','email']));
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Data Updated Successfully',
+        ]);
     }
 
     // Account_Users Delete Record
     public function delete($id)
     {
-        $account_users = AccountUser::find($id);
-        $account_users->delete();
-        return "Account Deleted Successfully";
+        $account_users = AccountUser::findOrFail($id)->delete();
+        return response()->json([
+            'status'  => true,
+            'message' => 'Data deleted successfully',
+        ]);
     }
 
     //Get list of Account_Users Table Records
     public function list()
     {
-        return AccountUser::all();
+        return response()->json([
+            'message'   => 'Data',
+            'data'      => AccountUser::all()
+        ]);
     }
 
     //Get Record from ID
     public function show($id)
     {
-        return AccountUser::find($id);
+        return response()->json([
+            'message'   => 'Data',
+            'data'      => AccountUser::findOrFail($id)
+        ]);
     }
 }
 

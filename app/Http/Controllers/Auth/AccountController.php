@@ -11,81 +11,84 @@ class AccountController extends Controller
 {
     public function update($id, Request $request)
     {
-        $account = Account::find($id);
-
-        // If request is null then it will store the old value in update otherwise new value(req value)
-
-        if ($request->account_name == null) {
-            $account_name = $account->account_name;
-        } else {
-            $account_name = $request->account_name;
-        }
-
-        if ($request->account_number == null) {
-            $account_number = $account->account_number;
-        } else {
-            $account_number = $request->account_number;
-        }
-
-        $account->update([
-            'account_name'   => $account_name,
-            'account_number' => $account_number,
+        $account = Account::findOrFail($id);
+        $validationForAccount = Validator::make($request->all(), [
+            'account_name'   => 'required | max:40',
+            'account_number' => 'required | numeric | unique:accounts,account_number',
         ]);
-        return $account;
+
+        if ($validationForAccount->fails()) {
+            return response()->json([
+                'status'    => false,
+                'message'   => 'Validation Error',
+                'error'     => $validationForAccount->errors()
+            ]);
+        }
+        $account->update($request->only(['account_name', 'account_number']));
+        return response()->json([
+            'status'    => true,
+            'message'   => 'Data Updated Successfully',
+        ]);
     }
 
     public function delete($id)
     {
-        $account = Account::find($id);
+        $account = Account::findOrFail($id);
 
         if ($account->is_default == true) {
-            return "Deletation not allowed for default account";
+            return response()->json([
+                'status'    => false,
+                'message'   => 'Deletation not allowed for default account'
+            ]);
         } else {
             $account->delete();
-            return "Account Deleted Successfully";
+            return response()->json([
+                'status'    => true,
+                'message'   => 'Account Deleted Successfully...'
+            ]);
         }
     }
 
     public function show($id)
     {
-        return Account::find($id);
+        return response()->json([
+            'message'   => 'Data',
+            'data'      => Account::findOrFail($id)
+        ]);
     }
 
     public function insert(Request $request)
     {
         $validationForAccount = Validator::make($request->all(), [
-            'account_name'   => 'required',
-            'account_number' => 'required | numeric | unique:accounts',
+            'account_name'   => 'required | max:40',
+            'account_number' => 'required | numeric | unique:accounts,account_number',
             'user_id'        => 'numeric | required | exists:users,id'
         ]);
 
         if ($validationForAccount->fails()) {
-            return $validationForAccount->errors();
+            return response()->json([
+                'status'     => false,
+                'message'    => 'Validation Error',
+                'error'      => $validationForAccount->errors()
+            ]);
         }
 
-        // $user = User::where('id',$request->user_id)->first();
-        // if($user){
-            $account = Account::create([
-                'account_name'      => $request->account_name,
-                'account_number'    => $request->account_number,
-                'user_id'           => $request->user_id
-            ]);
-    
-            return response()->json([
-                'status'            => true,
-                'message'           => 'Account Created Successfully',
-                'data'              => $account
-            ], 200);
-        // }
-        // else{
-        //     return "User Id Not Found";
-        // }
+        $account = Account::create($request->only(['account_name','account_number','user_id']));
 
-        
+        return response()->json([
+            'status'         => true,
+            'message'        => 'Account Created Successfully',
+            'data'           => $account
+        ], 200);
+
+
     }
 
     public function list()
     {
-        return Account::all();
+        return response()->json([
+            'message' => 'Data',
+            'data' => Account::all()
+        ]);
     }
 }

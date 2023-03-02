@@ -21,45 +21,43 @@ use App\Http\Controllers\HomeController;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     //Account
-    Route::prefix('account')->group(function () {
-        Route::controller(AccountController::class)->group(function () {
+        Route::controller(AccountController::class)->prefix('account')->group(function () {
             Route::post('update/{id}', 'update');
             Route::post('delete/{id}', 'delete');
             Route::get('list', 'list');
             Route::get('show/{id}', 'show');
             Route::post('insert', 'insert');
         });
-    });
 
     //Account_Users
-    Route::prefix('accountusers')->group(function () {
-        Route::controller(AccountUsersController::class)->group(function () {
+        Route::controller(AccountUsersController::class)->prefix('accountusers')->group(function () {
             Route::post('insert', 'insert');
             Route::post('update/{id}', 'update');
             Route::post('delete/{id}', 'delete');
             Route::get('list', 'list');
             Route::get('show/{id}', 'show');
         });
-    });
 
     //Transaction
-    Route::prefix('transaction')->group(function () {
-        Route::controller(TransactionController::class)->group(function () {
+        Route::controller(TransactionController::class)->prefix('transaction')->group(function () {
             Route::post('insert','insert');
             Route::post('update/{id}','update');
             Route::post('delete/{id}','delete');
             Route::get('list','list');
             Route::get('show/{id}','show');
-           
         });
-    });
 });
 
 //User Table
-Route::post('/create', [UserController::class, 'create'])->name('create');
-Route::get('/verify/{email_verification_code}', [UserController::class, 'verify'])->name('verify');
-Route::post('/login', [UserController::class, 'login'])->name('login');
-Route::post('/forgotpassword', [UserController::class, 'forgotPassword'])->name('forgotpassword');
-Route::post('/forgotpw', [UserController::class, 'forgotPw'])->name('forgotpw');
-Route::post('changePassword', [UserController::class, 'changePassword'])->name('changePassword')->middleware('auth:sanctum');
-Route::get('userprofile/{id}',[UserController::class, 'userProfile'])->name('userProfile')->middleware('auth:sanctum');
+
+Route::controller(UserController::class)->prefix('user')->group(function(){
+    Route::post('/create','create')->name('create');
+    Route::get('/verify/{email_verification_code}','verify')->name('verify');
+    Route::post('/login','login')->name('login');
+    Route::post('/forgotpassword','forgotPassword')->name('forgotpassword');
+    Route::post('/forgotpw','forgotPw')->name('forgotpw');
+    Route::post('changePassword','changePassword')->name('changePassword')->middleware('auth:sanctum');
+    Route::get('userprofile/{id}','userProfile')->name('userProfile')->middleware('auth:sanctum');
+});
+
+

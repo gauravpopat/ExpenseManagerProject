@@ -16,10 +16,12 @@ return new class extends Migration
         Schema::create('account_users', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('account_id');
-            $table->string('email');
-            $table->string('first_name');
-            $table->string('last_name');
+
+            $table->string('email','30');
+            $table->string('first_name','30');
+            $table->string('last_name','30');
             $table->timestamps();
+            
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
         });
     }

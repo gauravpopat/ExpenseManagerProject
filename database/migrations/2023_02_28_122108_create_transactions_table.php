@@ -15,14 +15,17 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->enum('type',['income','expense']);
-            $table->string('category');
             $table->unsignedBigInteger('account_user_id');
-            $table->string('amount');
             $table->unsignedBigInteger('account_id');
+
+            $table->enum('type',['income','expense']);
+            $table->string('category','40');
+            $table->string('amount');
+            $table->timestamps();
+            
             $table->foreign('account_user_id')->references('id')->on('account_users')->onDelete('cascade');
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
-            $table->timestamps();
+            
         });
     }
 

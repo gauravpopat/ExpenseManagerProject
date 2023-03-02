@@ -16,8 +16,4 @@ class Account extends Model
         'user_id'
     ];
 
-    public function account()
-    {
-        return $this->hasMany(Account::class);
-    }
 }
