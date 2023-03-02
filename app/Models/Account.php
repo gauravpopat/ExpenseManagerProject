@@ -16,17 +16,21 @@ class Account extends Model
         'user_id'
     ];
 
+    protected $casts = [
+        'is_default' => 'boolean',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function account_users()
+    public function accountUsers()
     {
         return $this->hasMany(AccountUser::class);
     }
 
-    public function transaction()
+    public function transactions()
     {
         return $this->hasMany(Transaction::class)->orderBy('created_at',"DESC");
     }

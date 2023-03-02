@@ -21,7 +21,7 @@ class AccountUser extends Model
         return $this->belongsTo(Account::class);
     }
 
-    public function transaction()
+    public function transactions()
     {
         return $this->hasMany(Transaction::class);
     }

@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use App\Models\AccountUser;
 use Illuminate\Support\Facades\Validator;
 
-
 class AccountUsersController extends Controller
 {
     //Account_Users Insert
@@ -22,19 +21,20 @@ class AccountUsersController extends Controller
 
         //Validation Error
         if ($validate->fails()) {
+            $errors = $validate->errors();
             return response()->json([
                 'status'    => false,
                 'message'   => 'Validation Error',
-                'error'     => $validate->errors()
+                'error'     => $errors
             ]);
         }
-        $getUser = User::where('email',$request->email)->first();
-        $fn = $getUser->first_name;
-        $ln = $getUser->last_name;
 
-        $account_users = AccountUser::create($request->only(['email','account_id'])+[
-            'first_name' => $fn,
-            'last_name'  => $ln
+        //no need to add if($user) because of validation
+        $user = User::where('email', $request->email)->first();
+
+        $account_users = AccountUser::create($request->only(['email', 'account_id']) + [
+            'first_name' => $user->first_name,
+            'last_name'  => $user->last_name
         ]);
 
         return response()->json([
@@ -55,48 +55,69 @@ class AccountUsersController extends Controller
 
         //Validation Error
         if ($validationForAccount->fails()) {
+            $errors = $validationForAccount->errors();
             return response()->json([
                 'status'    => false,
                 'message'   => 'Validation Error',
-                'error'     => $validationForAccount->errors()
+                'error'     => $errors
             ]);
         }
-        AccountUser::findOrFail($id)->update($request->only(['first_name','last_name','email']));
-
-        return response()->json([
-            'status'  => true,
-            'message' => 'Data Updated Successfully',
-        ]);
+        $user = AccountUser::find($id);
+        if ($user) {
+            $user->update($request->only(['first_name', 'last_name', 'email']));
+            return response()->json([
+                'status'  => true,
+                'message' => 'Data Updated Successfully',
+            ]);
+        } else {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Account User not found',
+            ]);
+        }
     }
 
     // Account_Users Delete Record
     public function delete($id)
     {
-        AccountUser::findOrFail($id)->delete();
-        return response()->json([
-            'status'  => true,
-            'message' => 'Data deleted successfully',
-        ]);
+        $user = AccountUser::find($id);
+        if ($user) {
+            AccountUser::findOrFail($id)->delete();
+            return response()->json([
+                'status'  => true,
+                'message' => 'Account User deleted successfully',
+            ]);
+        } else {
+            return response()->json([
+                'status'  => false,
+                'message' => 'User not found'
+            ]);
+        }
     }
 
     //Get list of Account_Users Table Records
     public function list()
     {
-        $data = AccountUser::all();
+        $accountUsers = AccountUser::all();
         return response()->json([
-            'message'   => 'Data',
-            'data'      => $data
+            'message'   => 'Account Users Data',
+            'data'      => $accountUsers
         ]);
     }
 
     //Get Record from ID
     public function show($id)
     {
-        $data = AccountUser::findOrFail($id);
-        return response()->json([
-            'message'   => 'Data',
-            'data'      => $data
-        ]);
+        $accountUser = AccountUser::findOrFail($id);
+        if ($accountUser) {
+            return response()->json([
+                'message'   => 'Account User',
+                'data'      => $accountUser
+            ]);
+        } else {
+            return response()->json([
+                'message'   => 'Account user not found'
+            ]);
+        }
     }
 }
-

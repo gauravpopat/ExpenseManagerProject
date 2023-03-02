@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
 {
-    //Transaction CRUD
-
     //Insert
     public function insert(Request $request)
     {
@@ -25,14 +23,16 @@ class TransactionController extends Controller
 
         //Validation Error
         if ($validate->fails()) {
+            $errors = $validate->errors();
             return response()->json([
                 'status'    => false,
                 'message'   => 'Validation Error',
-                'error'     => $validate->errors()
+                'error'     => $errors
             ]);
         }
+
         //Insert
-        $transaction = Transaction::create($request->only(['type','category','amount','account_user_id','account_id']));
+        $transaction = Transaction::create($request->only(['type', 'category', 'amount', 'account_user_id', 'account_id']));
         return response()->json([
             'status'            => true,
             'message'           => 'Inserted Successfully',
@@ -44,40 +44,65 @@ class TransactionController extends Controller
     //Update
     public function update($id, Request $request)
     {
-        Transaction::findOrFail($id)->update($request->only('type','category','amount'));
-        return response()->json([
-            'status'   => true,
-            'message'  => 'Data Updated Successfully',
-        ]);
+        $transaction = Transaction::find($id);
+        if ($transaction) {
+            Transaction::findOrFail($id)->update($request->only('type', 'category', 'amount'));
+            return response()->json([
+                'status'   => true,
+                'message'  => 'Data Updated Successfully',
+            ]);
+        } else {
+            return response()->json([
+                'status'   => false,
+                'message'  => 'Transaction not found',
+            ]);
+        }
     }
 
     //Delete record from transaction
     public function delete($id)
     {
-        Transaction::findOrFail($id)->delete();
-        return response()->json([
-            'status'    => true,
-            'message'   => 'Data Deleted Successfully',
-        ]);
+        $transaction = Transaction::find($id);
+        if ($transaction) {
+            Transaction::findOrFail($id)->delete();
+            return response()->json([
+                'status'    => true,
+                'message'   => 'Transaction Deleted Successfully',
+            ]);
+        } else {
+            return response()->json([
+                'status'    => false,
+                'message'   => 'Transaction not found',
+            ]);
+        }
     }
 
     //Get list of Transaction Table Records
     public function list()
     {
-        $transaction = Transaction::all();
+        $transactions = Transaction::all();
         return response()->json([
-            'message'   => 'Data',
-            'data'      => $transaction
+            'message'   => 'Transactions',
+            'data'      => $transactions
         ]);
     }
 
     //Get Record from ID
     public function show($id)
     {
-        $transaction = Transaction::findOrFail($id);
-        return response()->json([
-            'message'   => 'Data',
-            'data'      => $transaction
-        ]);
+        $getTransaction = Transaction::find($id);
+        if($getTransaction){
+            $transaction = Transaction::findOrFail($id);
+            return response()->json([
+                'message'   => 'Transaction',
+                'data'      => $transaction
+            ]);
+        }
+        else{
+            return response()->json([
+                'message'   => 'Transaction Not Found'
+            ]);
+        }
+        
     }
 }

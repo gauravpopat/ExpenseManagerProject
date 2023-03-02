@@ -23,15 +23,18 @@ class AuthController extends Controller
         ]);
         //Validation Error
         if ($validate->fails()) {
+            $errors = $validate->errors();
             return response()->json([
                 'status'    => false,
                 'message'   => 'Validation Error',
-                'error'     => $validate->errors()
+                'error'     => $errors
             ]);
         }
 
         //Change Password
-        $user = User::where('id', Auth()->user()->id)->first();
+
+        $user = User::where('id', auth()->user()->id)->first();
+
         if (Hash::check($request->old_password, $user->password)) {
             $user->update([
                 'password'  => Hash::make($request->password)
@@ -49,19 +52,33 @@ class AuthController extends Controller
     }
     public function userProfile($id)
     {
-        $user  = User::with('account','userOfAccount','transactions')->findOrFail($id);
-        return response()->json([
-            'message'           => 'User Profile',
-            'User Data'         => $user,
-        ]);
+        $user = User::find($id);
+        if ($user) {
+            $userProfile = $user->with('accounts', 'usersOfAccounts', 'transactions');
+            return response()->json([
+                'message'           => 'User Profile',
+                'User Data'         => $userProfile,
+            ]);
+        } else {
+            return response()->json([
+                'message'           => 'User Not Found',
+            ]);
+        }
     }
 
     public function accountDetails($id)
     {
-        $account = Account::with('transaction')->findOrFail($id);
-        return response()->json([
-            'message'           => 'Account Details',
-            'Account Data'      => $account
-        ]);
+        $account = Account::find($id);
+        if ($account) {
+            $accountDetails = Account::with('transactions')->findOrFail($id);
+            return response()->json([
+                'message'           => 'Account Details',
+                'Account Data'      => $accountDetails
+            ]);
+        } else {
+            return response()->json([
+                'message'           => 'Account Not Found',
+            ]);
+        }
     }
 }

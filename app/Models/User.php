@@ -48,14 +48,15 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_onboarded'      => 'boolean'
     ];
 
-    public function account()
+    public function accounts()
     {
         return $this->hasMany(Account::class);
     }
 
-    public function userOfAccount()
+    public function usersOfAccounts()
     {
         return $this->hasManyThrough(AccountUser::class,Account::class);
     }

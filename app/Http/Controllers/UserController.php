@@ -14,7 +14,6 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Models\PasswordReset;
 use Illuminate\Http\Request;
-use Mockery\Generator\StringManipulation\Pass\Pass;
 
 class UserController extends Controller
 {
@@ -31,9 +30,10 @@ class UserController extends Controller
 
         //Validation Error
         if ($validateUser->fails()) {
+            $errors = $validateUser->errors();
             return response()->json([
                 'message'   => 'Validation Error',
-                'error'     => $validateUser->errors()
+                'error'     => $errors
             ]);
         }
 
@@ -55,10 +55,11 @@ class UserController extends Controller
         //Welcome Mail
         Mail::to($user->email)->send(new WelcomeMail($user));
         //Response
+        $apiToken = $user->createToken("API TOKEN")->plainTextToken;
         return response()->json([
             'status'    => true,
             'message'   => 'User Created Successfully',
-            'token'     => $user->createToken("API TOKEN")->plainTextToken
+            'token'     => $apiToken
         ], 200);
     }
 
@@ -66,15 +67,16 @@ class UserController extends Controller
     {
         //Validation
         $validateUser   = Validator::make($request->all(), [
-            'email'     => 'required|email|max:40|exists:users,email',
-            'password'  => 'required|min:8',
+            'email'     => 'required|email|exists:users,email',
+            'password'  => 'required',
         ]);
 
         //Validation Error
         if ($validateUser->fails()) {
+            $errors = $validateUser->errors();
             return response()->json([
                 'message'   => 'Validation Error',
-                'error'     => $validateUser->errors()
+                'error'     => $errors
             ]);
         }
 
@@ -88,13 +90,13 @@ class UserController extends Controller
         } else {
             // Checking user entered details
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                $apiToken = $user->createToken("API TOKEN")->plainTextToken;
                 return response()->json([
                     'status'    => true,
                     'message'   => 'Login Successfully',
-                    'token'     => $user->createToken("API TOKEN")->plainTextToken
+                    'token'     => $apiToken
                 ], 200);
-            }
-            else{
+            } else {
                 return response()->json([
                     'status'    => false,
                     'message'   => 'Password Incorrect'
@@ -106,13 +108,20 @@ class UserController extends Controller
     public function verifyEmail($verificaton_code)
     {
         $user = User::where('email_verification_code', $verificaton_code)->first();
-        $user->update([
-            'is_onboarded'      => true,
-            'email_verified_at' => now()
-        ]);
-        return response()->json([
-            'message'           => 'Verification Successfull'
-        ]);
+
+        if ($user) {
+            $user->update([
+                'is_onboarded'      => true,
+                'email_verified_at' => now()
+            ]);
+            return response()->json([
+                'message'           => 'Verification Successfull'
+            ]);
+        } else {
+            return response()->json([
+                'message'           => 'User not found'
+            ]);
+        }
     }
 
     public function forgotPasswordLink(Request $request)
@@ -124,29 +133,32 @@ class UserController extends Controller
 
         //Validation Error
         if ($validate->fails()) {
+            $errors = $validate->errors();
             return response()->json([
                 'status'    => false,
                 'message'   => 'Validation Error',
-                'error'     => $validate->errors()
+                'error'     => $errors
             ]);
         }
-        //
-        $user = User::where('email',$request->email)->first();
-        if($user){
-            $token = Str::random(64);
 
-            PasswordReset::create($request->only(['email'])+[
-                'token'         => $token,
-                'created_at'    => now()
-            ]);
-
-        $user['token'] = $token;
-        Mail::to($user->email)->send(new ResetPassword($user));
-        }
-        return response()->json([
-            'status'  => true,
-            'message' => 'Email Sent! Check it',
+        $user = User::where('email', $request->email)->first();
+        $token = Str::random(64);
+        PasswordReset::create($request->only(['email']) + [
+            'token'         => $token,
+            'created_at'    => now()
         ]);
+        $user['token'] = $token;
+        if (Mail::to($user->email)->send(new ResetPassword($user))) {
+            return response()->json([
+                'status'  => true,
+                'message' => 'Email Sent!',
+            ]);
+        } else {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Some problem!',
+            ]);
+        }
     }
 
     public function forgotPassword(Request $request)
@@ -161,10 +173,11 @@ class UserController extends Controller
 
         //Validation Error
         if ($validate->fails()) {
+            $errors = $validate->errors();
             return response()->json([
                 'status'  => false,
                 'message' => 'Validation Error',
-                'error'   => $validate->errors()
+                'error'   => $errors
             ]);
         }
 
@@ -180,7 +193,7 @@ class UserController extends Controller
         } else {
             return response()->json([
                 'status'  => false,
-                'message' => 'Token Not Valid',
+                'message' => 'User not found',
             ]);
         }
     }
