@@ -54,7 +54,7 @@ class AuthController extends Controller
     {
         $user = User::find($id);
         if ($user) {
-            $userProfile = $user->with('accounts', 'usersOfAccounts', 'transactions');
+            $userProfile = $user->with('accounts', 'usersOfAccounts', 'transactions')->find($id);
             return response()->json([
                 'message'           => 'User Profile',
                 'User Data'         => $userProfile,
