@@ -31,8 +31,8 @@ class UserController extends Controller
         //Validation Error
         if ($validateUser->fails()) {
             return response()->json([
-                'message' => 'Validation Error',
-                'error' => $validateUser->errors()
+                'message'   => 'Validation Error',
+                'error'     => $validateUser->errors()
             ]);
         }
         //Create User
@@ -53,9 +53,9 @@ class UserController extends Controller
         Mail::to($user->email)->send(new WelcomeMail($user));
         //Response
         return response()->json([
-            'status' => true,
-            'message' => 'User Created Successfully',
-            'token' => $user->createToken("API TOKEN")->plainTextToken
+            'status'    => true,
+            'message'   => 'User Created Successfully',
+            'token'     => $user->createToken("API TOKEN")->plainTextToken
         ], 200);
     }
 

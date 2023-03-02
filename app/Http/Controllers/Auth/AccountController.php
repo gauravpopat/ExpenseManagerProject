@@ -87,8 +87,8 @@ class AccountController extends Controller
     public function list()
     {
         return response()->json([
-            'message' => 'Data',
-            'data' => Account::all()
+            'message'   => 'Data',
+            'data'      => Account::all()
         ]);
     }
 }
