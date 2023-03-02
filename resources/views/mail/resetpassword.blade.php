@@ -12,7 +12,7 @@
         <pre>
         Hello {{ $user['first_name'] }},
         Forgot Password Code:
-            {{$user['email_verification_code']}}
+            {{$user['token']}}
         Regards,
         {{ env('MAIL_FROM_NAME') }}
     </pre>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -16,11 +16,11 @@ class TransactionController extends Controller
     {
         //Validation
         $validate = Validator::make($request->all(), [
-            'type'                  => 'required | max:40 | in:income,expense',
-            'category'              => 'required | max:40',
-            'amount'                => 'required | numeric',
-            'account_user_id'       => 'numeric | required | exists:account_users,id',
-            'account_id'            => 'numeric | required | exists:accounts,id'
+            'type'                  => 'required|max:40|in:income,expense',
+            'category'              => 'required|max:40',
+            'amount'                => 'required|numeric',
+            'account_user_id'       => 'required|numeric|exists:account_users,id',
+            'account_id'            => 'required|numeric|exists:accounts,id'
         ]);
 
         //Validation Error
@@ -44,8 +44,7 @@ class TransactionController extends Controller
     //Update
     public function update($id, Request $request)
     {
-        $transaction   = Transaction::findOrFail($id);
-        $transaction->update($request->only('type','category','amount'));
+        Transaction::findOrFail($id)->update($request->only('type','category','amount'));
         return response()->json([
             'status'   => true,
             'message'  => 'Data Updated Successfully',
@@ -55,7 +54,7 @@ class TransactionController extends Controller
     //Delete record from transaction
     public function delete($id)
     {
-        $transaction = Transaction::findOrFail($id)->delete();
+        Transaction::findOrFail($id)->delete();
         return response()->json([
             'status'    => true,
             'message'   => 'Data Deleted Successfully',
@@ -65,18 +64,20 @@ class TransactionController extends Controller
     //Get list of Transaction Table Records
     public function list()
     {
+        $transaction = Transaction::all();
         return response()->json([
             'message'   => 'Data',
-            'data'      => Transaction::all()
+            'data'      => $transaction
         ]);
     }
 
     //Get Record from ID
     public function show($id)
     {
+        $transaction = Transaction::findOrFail($id);
         return response()->json([
             'message'   => 'Data',
-            'data'      => Transaction::findOrFail($id)
+            'data'      => $transaction
         ]);
     }
 }

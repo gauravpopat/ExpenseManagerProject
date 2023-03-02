@@ -55,13 +55,14 @@ class User extends Authenticatable
         return $this->hasMany(Account::class);
     }
 
-    public function getUserOfAccount()
+    public function userOfAccount()
     {
         return $this->hasManyThrough(AccountUser::class,Account::class);
     }
 
-    public function getTransactions()
+    public function transactions()
     {
-        return $this->hasManyThrough(Transaction::class,Account::class);
+        return $this->hasManyThrough(Transaction::class,Account::class)->orderBy('created_at', 'DESC');
+        // return $this->hasManyThrough(Transaction::class,Account::class);
     }
 }

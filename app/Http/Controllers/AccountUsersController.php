@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\AccountUser;
 use Illuminate\Support\Facades\Validator;
@@ -15,10 +16,10 @@ class AccountUsersController extends Controller
     {
         //Validation
         $validate = Validator::make($request->all(), [
-            'first_name'            => 'required | max:40',
-            'last_name'             => 'required | max:40',
-            'email'                 => 'required | email | unique:users',
-            'account_id'            => 'numeric | required | exists:accounts,id'
+            // 'first_name'            => 'required|max:40',
+            // 'last_name'             => 'required|max:40',
+            'email'                 => 'required|email|exists:users,email',
+            'account_id'            => 'required|numeric|exists:accounts,id'
         ]);
 
         //Validation Error
@@ -29,7 +30,14 @@ class AccountUsersController extends Controller
                 'error'     => $validate->errors()
             ]);
         }
-        $account_users = AccountUser::create($request->only(['first_name','last_name','email','account_id']));
+        $getUser = User::where('email',$request->email)->first();
+        $fn = $getUser->first_name;
+        $ln = $getUser->last_name;
+
+        $account_users = AccountUser::create($request->only(['email','account_id'])+[
+            'first_name' => $fn,
+            'last_name'  => $ln
+        ]);
 
         return response()->json([
             'status'            => true,
@@ -41,11 +49,10 @@ class AccountUsersController extends Controller
     // Account_Users Update
     public function update($id, Request $request)
     {
-        $account_users = AccountUser::findOrFail($id);
         $validationForAccount = Validator::make($request->all(), [
-            'first_name'   => 'required | max:40',
-            'last_name'    => 'required | max:40',
-            'email'        => 'required | email | unique:account_users,email'
+            'first_name'   => 'required|max:40',
+            'last_name'    => 'required|max:40',
+            'email'        => 'required|email|unique:account_users,email'
         ]);
 
         //Validation Error
@@ -56,8 +63,7 @@ class AccountUsersController extends Controller
                 'error'     => $validationForAccount->errors()
             ]);
         }
-
-        $account_users->update($request->only(['first_name','last_name','email']));
+        AccountUser::findOrFail($id)->update($request->only(['first_name','last_name','email']));
 
         return response()->json([
             'status'  => true,
@@ -68,7 +74,7 @@ class AccountUsersController extends Controller
     // Account_Users Delete Record
     public function delete($id)
     {
-        $account_users = AccountUser::findOrFail($id)->delete();
+        AccountUser::findOrFail($id)->delete();
         return response()->json([
             'status'  => true,
             'message' => 'Data deleted successfully',
@@ -78,18 +84,20 @@ class AccountUsersController extends Controller
     //Get list of Account_Users Table Records
     public function list()
     {
+        $data = AccountUser::all();
         return response()->json([
             'message'   => 'Data',
-            'data'      => AccountUser::all()
+            'data'      => $data
         ]);
     }
 
     //Get Record from ID
     public function show($id)
     {
+        $data = AccountUser::findOrFail($id);
         return response()->json([
             'message'   => 'Data',
-            'data'      => AccountUser::findOrFail($id)
+            'data'      => $data
         ]);
     }
 }
