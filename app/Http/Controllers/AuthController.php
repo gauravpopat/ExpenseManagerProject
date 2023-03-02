@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Account;
@@ -18,7 +18,7 @@ class AuthController extends Controller
         //Validaton
         $validate = Validator::make($request->all(), [
             'old_password'          => 'required',
-            'password'              => 'required|confirmed |min:8',
+            'password'              => 'required|confirmed|min:8',
             'password_confirmation' => 'required'
         ]);
         //Validation Error
@@ -31,7 +31,7 @@ class AuthController extends Controller
         }
 
         //Change Password
-        $user = User::where('id', Auth::user()->id)->first();
+        $user = User::where('id', Auth()->user()->id)->first();
         if (Hash::check($request->old_password, $user->password)) {
             $user->update([
                 'password'  => Hash::make($request->password)

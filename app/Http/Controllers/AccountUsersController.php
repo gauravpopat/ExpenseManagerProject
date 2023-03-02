@@ -16,8 +16,6 @@ class AccountUsersController extends Controller
     {
         //Validation
         $validate = Validator::make($request->all(), [
-            // 'first_name'            => 'required|max:40',
-            // 'last_name'             => 'required|max:40',
             'email'                 => 'required|email|exists:users,email',
             'account_id'            => 'required|numeric|exists:accounts,id'
         ]);

@@ -26,7 +26,7 @@ class UserController extends Controller
             'last_name'     => 'required|max:40|alpha',
             'email'         => 'required|max:40|email|unique:users,email',
             'phone'         => 'required|regex:/[6-9][0-9]{9}/|unique:users,phone',
-            'password'      => 'required|confirmed |min:8',
+            'password'      => 'required|confirmed|min:8',
         ]);
 
         //Validation Error
@@ -66,7 +66,7 @@ class UserController extends Controller
     {
         //Validation
         $validateUser   = Validator::make($request->all(), [
-            'email'     => 'required|email|max:40|exists:users',
+            'email'     => 'required|email|max:40|exists:users,email',
             'password'  => 'required|min:8',
         ]);
 
