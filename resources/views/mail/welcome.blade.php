@@ -12,7 +12,7 @@
         <pre>
         Hello {{ $user['first_name'] }},
         Thank you for joining us...
-            <a href="{{URL('api/verify/'.$user['email_verification_code'])}}"><i>Click Here For the Verification</i></a>
+            <a href="{{URL('api/user/verify/'.$user['email_verification_code'])}}"><i>Click Here For the Verification</i></a>
         Regards,
         {{ env('MAIL_FROM_NAME') }}
     </pre>

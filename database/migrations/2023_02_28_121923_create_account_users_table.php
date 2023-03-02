@@ -17,9 +17,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('account_id');
 
-            $table->string('email','30');
-            $table->string('first_name','30');
-            $table->string('last_name','30');
+            $table->string('email','40');
+            $table->string('first_name','40');
+            $table->string('last_name','40');
             $table->timestamps();
             
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');

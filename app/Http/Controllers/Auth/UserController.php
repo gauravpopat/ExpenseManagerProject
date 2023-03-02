@@ -209,11 +209,16 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $account = User::findOrFail($id)->account;
+        $UserOfAccount = User::find($id)->getUserOfAccount;
+        $transaction = User::find($id)->getTransactions;
+        
 
         return response()->json([
-            'message'       => 'User Detail',
-            'User'          => $user,
-            'User Account'  => $account
+            'message'           => 'User Profile',
+            'User'              => $user,
+            'User Account'      => $account,
+            'Users in Account'  => $UserOfAccount,
+            'transaction'       => $transaction
         ]);
     }
 }
