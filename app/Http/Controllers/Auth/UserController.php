@@ -207,10 +207,10 @@ class UserController extends Controller
     }
     public function userProfile($id)
     {
-        $user = User::findOrFail($id);
-        $account = User::findOrFail($id)->account;
-        $UserOfAccount = User::find($id)->getUserOfAccount;
-        $transaction = User::find($id)->getTransactions;
+        $user           = User::findOrFail($id);
+        $account        = User::findOrFail($id)->account;
+        $UserOfAccount  = User::find($id)->getUserOfAccount;
+        $transaction    = User::find($id)->getTransactions;
         
 
         return response()->json([
