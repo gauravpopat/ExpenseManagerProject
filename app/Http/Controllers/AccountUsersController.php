@@ -15,9 +15,8 @@ class AccountUsersController extends Controller
     {
         $accountUsers = AccountUser::all();
         if ($accountUsers) {
-            $accountUsers = $accountUsers->load('account','transactions');
             return response()->json([
-                'message'            => 'Account Users Data',
+                'message'            => 'Account Users',
                 'account users'      => $accountUsers,
             ]);
         }
@@ -97,11 +96,12 @@ class AccountUsersController extends Controller
     //Get Record from ID
     public function show($id)
     {
-        $accountUser = AccountUser::find($id);
-        if ($accountUser) {
+        $accountUsers = AccountUser::find($id);
+        if ($accountUsers) {
+            $accountUsers = $accountUsers->load('account','transactions');
             return response()->json([
-                'message'   => 'Account User',
-                'data'      => $accountUser
+                'message'            => 'Account User Information',
+                'account users'      => $accountUsers
             ]);
         } else {
             return response()->json([

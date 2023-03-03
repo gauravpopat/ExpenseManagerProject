@@ -26,7 +26,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('update/{id}', 'update');
         Route::get('show/{id}', 'show');
         Route::post('delete/{id}', 'delete');
-        Route::get('account-details/{id}', 'accountDetails')->name('account-detail');
     });
 
     //Account_Users

@@ -14,9 +14,8 @@ class TransactionController extends Controller
     {
         $transactions = Transaction::all();
         if ($transactions) {
-            $transactions = $transactions->load('account','accountUsers');
             return response()->json([
-                'message'            => 'Transaction Data',
+                'message'            => 'Transaction Record',
                 'transaction'        => $transactions,
             ]);
         }
@@ -79,12 +78,12 @@ class TransactionController extends Controller
     //Get Record from ID
     public function show($id)
     {
-        $getTransaction = Transaction::find($id);
-        if($getTransaction){
-            $transaction = Transaction::find($id);
+        $transactions = Transaction::find($id);
+        if($transactions){
+            $transactions = $transactions->load('user','account','accountUsers');
             return response()->json([
-                'message'   => 'Transaction',
-                'data'      => $transaction
+                'message'           => 'Transactions Data',
+                'transactions'      => $transactions
             ]);
         }
         else{

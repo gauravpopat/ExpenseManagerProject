@@ -78,6 +78,7 @@ class AccountController extends Controller
     {
         $account = Account::find($id);
         if($account){
+            $account = $account->load('transactions','user','accountUsers');
             return response()->json([
                 'message'   => 'Data',
                 'accounts'      => $account
@@ -111,22 +112,6 @@ class AccountController extends Controller
             return response()->json([
                 'status'    => false,
                 'message'   => 'No Account Found'
-            ]);
-        }
-    }
-
-    public function accountDetails($id)
-    {
-        $account = Account::find($id);
-        if ($account) {
-            $accountsDetail = $account->load('transactions','user','accountUsers');
-            return response()->json([
-                'message'           => 'Account Details',
-                'Account Data'      => $accountsDetail
-            ]);
-        } else {
-            return response()->json([
-                'message'           => 'Account Not Found',
             ]);
         }
     }

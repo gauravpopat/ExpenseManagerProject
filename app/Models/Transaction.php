@@ -27,5 +27,10 @@ class Transaction extends Model
     {
         return $this->belongsTo(AccountUser::class,'account_user_id');
     }
+
+    public function user()
+    {
+        return $this->hasOneThrough(User::class,Account::class,'user_id','id');
+    }
     
 }
