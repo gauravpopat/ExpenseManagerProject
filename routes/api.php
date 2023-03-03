@@ -32,7 +32,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::controller(AccountUsersController::class)->prefix('accountusers')->group(function () {
         Route::get('list', 'list');
         Route::post('insert', 'insert');
-        Route::post('update/{id}', 'update');
+        Route::post('update', 'update');
         Route::get('show/{id}', 'show');
         Route::post('delete/{id}', 'delete');
     });

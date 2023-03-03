@@ -14,15 +14,14 @@ class TransactionController extends Controller
     //Get list of Transaction Table Records
     public function list()
     {
-        $user = User::where('id',Auth()->user()->id)->get();
+        $user = User::where('id', Auth()->user()->id)->get();
         $transactions = $user->load('transactions');
         if ($transactions) {
             return response()->json([
                 'message'            => 'Transaction Record',
                 'transaction'        => $transactions,
             ]);
-        }
-        else{
+        } else {
             return response()->json([
                 'message'   => 'No transaction Data Found',
             ]);
@@ -61,35 +60,45 @@ class TransactionController extends Controller
     }
 
     //Update
-    public function update($id, Request $request)
+    public function update(Request $request)
     {
-        $transaction = Transaction::find($id);
-        if ($transaction) {
-            $transaction->update($request->only('type', 'category', 'amount'));
+        //Validation
+        $validate = Validator::make($request->all(), [
+            'id'                    => 'required|exists:transactions,id',
+            'type'                  => 'required|in:income,expense',
+            'category'              => 'required|max:40',
+            'amount'                => 'required|numeric'
+        ]);
+
+        //Validation Error
+        if ($validate->fails()) {
+            $errors = $validate->errors();
             return response()->json([
-                'status'   => true,
-                'message'  => 'Data Updated Successfully',
-            ]);
-        } else {
-            return response()->json([
-                'status'   => false,
-                'message'  => 'Transaction not found',
+                'status'    => false,
+                'message'   => 'Validation Error',
+                'error'     => $errors
             ]);
         }
+
+        $transaction = Transaction::find($request->id);
+        $transaction->update($request->only('type', 'category', 'amount'));
+        return response()->json([
+            'status'   => true,
+            'message'  => 'Data Updated Successfully',
+        ]);
     }
 
     //Get Record from ID
     public function show($id)
     {
         $transactions = Transaction::find($id);
-        if($transactions){
-            $transactions = $transactions->load('account','accountUsers');
+        if ($transactions) {
+            $transactions = $transactions->load('account', 'accountUsers');
             return response()->json([
                 'message'           => 'Transactions Data',
                 'transactions'      => $transactions
             ]);
-        }
-        else{
+        } else {
             return response()->json([
                 'message'   => 'Transaction Not Found'
             ]);
@@ -113,6 +122,4 @@ class TransactionController extends Controller
             ]);
         }
     }
-
-    
 }

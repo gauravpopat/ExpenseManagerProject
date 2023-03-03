@@ -15,15 +15,14 @@ class AccountUsersController extends Controller
     //Get list of Account_Users Table Records
     public function list()
     {
-        $account = User::where('id',Auth()->user()->id)->get();
+        $account = User::where('id', Auth()->user()->id)->get();
         $accountUser = $account->load('userAccount');
         if ($accountUser) {
             return response()->json([
                 'message'            => 'Account Users',
                 'account users'      => $accountUser,
             ]);
-        }
-        else{
+        } else {
             return response()->json([
                 'message'   => 'No Account Users Data Found',
             ]);
@@ -65,9 +64,10 @@ class AccountUsersController extends Controller
     }
 
     // Account_Users Update
-    public function update($id, Request $request)
+    public function update(Request $request)
     {
         $validationForAccount = Validator::make($request->all(), [
+            'id'           => 'required|exists:account_users,id',
             'first_name'   => 'required|max:40|string',
             'last_name'    => 'required|max:40|string',
             'email'        => 'required|email|max:40|unique:account_users,email'
@@ -82,26 +82,20 @@ class AccountUsersController extends Controller
                 'error'     => $errors
             ]);
         }
-        $user = AccountUser::find($id);
-        if ($user) {
-            $user->update($request->only(['first_name', 'last_name', 'email']));
-            return response()->json([
-                'status'  => true,
-                'message' => 'Data Updated Successfully',
-            ]);
-        } else {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Account User not found',
-            ]);
-        }
+        $user = AccountUser::find($request->id);
+
+        $user->update($request->only(['first_name', 'last_name', 'email']));
+        return response()->json([
+            'status'  => true,
+            'message' => 'Data Updated Successfully',
+        ]);
     }
     //Get Record from ID
     public function show($id)
     {
         $accountUser = AccountUser::find($id);
         if ($accountUser) {
-            $accountUser = $accountUser->load('account','transactions');
+            $accountUser = $accountUser->load('account', 'transactions');
             return response()->json([
                 'message'            => 'Account User Information',
                 'account users'      => $accountUser
