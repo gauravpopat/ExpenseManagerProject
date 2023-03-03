@@ -15,8 +15,8 @@ class AccountUsersController extends Controller
     //Get list of Account_Users Table Records
     public function list()
     {
-        $account = User::where('id', Auth()->user()->id)->get();
-        $accountUser = $account->load('userAccount');
+        $account = Account::where('user_id', Auth()->user()->id)->get();
+        $accountUser = $account->load('accountUsers');
         if ($accountUser) {
             return response()->json([
                 'message'            => 'Account Users',
