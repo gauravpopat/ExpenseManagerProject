@@ -22,11 +22,12 @@ class AuthController extends Controller
     {
         //Validation
         $validateUser = Validator::make($request->all(), [
-            'first_name'    => 'required|max:40|string',
-            'last_name'     => 'required|max:40|string',
-            'email'         => 'required|max:40|email|unique:users,email',
-            'phone'         => 'required|regex:/[6-9][0-9]{9}/|unique:users,phone',
-            'password'      => 'required|confirmed|min:8',
+            'first_name'            => 'required|max:40|string',
+            'last_name'             => 'required|max:40|string',
+            'email'                 => 'required|max:40|email|unique:users,email',
+            'phone'                 => 'required|regex:/[6-9][0-9]{9}/|unique:users,phone',
+            'password'              => 'required|confirmed|min:8',
+            'password_confirmation' => 'required'
         ]);
 
         //Validation Error
@@ -117,7 +118,7 @@ class AuthController extends Controller
                 'email_verified_at' => now()
             ]);
             return response()->json([
-                'message'           => 'Verification Successfull'
+                'message'           => 'Verification Successful'
             ]);
         } else {
             return response()->json([
@@ -169,7 +170,7 @@ class AuthController extends Controller
         //Validation
         $validate = Validator::make($request->all(), [
             'email'                 => 'required|email|exists:password_resets,email',
-            'password'              => 'required|confirmed|min:8',
+            'password'              => 'required|confirmed|min:8|max:40',
             'password_confirmation' => 'required',
             'token'                 => 'required|exists:password_resets,token'
         ]);

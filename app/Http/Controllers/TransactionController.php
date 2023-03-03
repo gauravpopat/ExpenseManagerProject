@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
@@ -12,7 +14,8 @@ class TransactionController extends Controller
     //Get list of Transaction Table Records
     public function list()
     {
-        $transactions = Transaction::all();
+        $user = User::where('id',Auth()->user()->id)->get();
+        $transactions = $user->load('transactions');
         if ($transactions) {
             return response()->json([
                 'message'            => 'Transaction Record',
@@ -31,7 +34,7 @@ class TransactionController extends Controller
     {
         //Validation
         $validate = Validator::make($request->all(), [
-            'type'                  => 'required|max:40|in:income,expense',
+            'type'                  => 'required|in:income,expense',
             'category'              => 'required|max:40',
             'amount'                => 'required|numeric',
             'account_user_id'       => 'required|numeric|exists:account_users,id',
@@ -62,7 +65,7 @@ class TransactionController extends Controller
     {
         $transaction = Transaction::find($id);
         if ($transaction) {
-            Transaction::find($id)->update($request->only('type', 'category', 'amount'));
+            $transaction->update($request->only('type', 'category', 'amount'));
             return response()->json([
                 'status'   => true,
                 'message'  => 'Data Updated Successfully',
@@ -80,7 +83,7 @@ class TransactionController extends Controller
     {
         $transactions = Transaction::find($id);
         if($transactions){
-            $transactions = $transactions->load('user','account','accountUsers');
+            $transactions = $transactions->load('account','accountUsers');
             return response()->json([
                 'message'           => 'Transactions Data',
                 'transactions'      => $transactions
@@ -91,7 +94,6 @@ class TransactionController extends Controller
                 'message'   => 'Transaction Not Found'
             ]);
         }
-        
     }
 
     //Delete record from transaction
@@ -99,7 +101,7 @@ class TransactionController extends Controller
     {
         $transaction = Transaction::find($id);
         if ($transaction) {
-            Transaction::find($id)->delete();
+            $transaction->delete();
             return response()->json([
                 'status'    => true,
                 'message'   => 'Transaction Deleted Successfully',

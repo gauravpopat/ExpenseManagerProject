@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\AccountUser;
+use App\Models\Account;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AccountUsersController extends Controller
@@ -13,11 +15,12 @@ class AccountUsersController extends Controller
     //Get list of Account_Users Table Records
     public function list()
     {
-        $accountUsers = AccountUser::all();
-        if ($accountUsers) {
+        $account = User::where('id',Auth()->user()->id)->get();
+        $accountUser = $account->load('userAccount');
+        if ($accountUser) {
             return response()->json([
                 'message'            => 'Account Users',
-                'account users'      => $accountUsers,
+                'account users'      => $accountUser,
             ]);
         }
         else{
@@ -32,8 +35,8 @@ class AccountUsersController extends Controller
     {
         //Validation
         $validate = Validator::make($request->all(), [
-            'email'                 => 'required|email|exists:users,email',
-            'account_id'            => 'required|numeric|exists:accounts,id'
+            'email'                 => 'required|email|max:40|exists:users,email',
+            'account_id'            => 'required|numeric|digits:12|exists:accounts,id'
         ]);
 
         //Validation Error
@@ -67,7 +70,7 @@ class AccountUsersController extends Controller
         $validationForAccount = Validator::make($request->all(), [
             'first_name'   => 'required|max:40|string',
             'last_name'    => 'required|max:40|string',
-            'email'        => 'required|email|unique:account_users,email'
+            'email'        => 'required|email|max:40|unique:account_users,email'
         ]);
 
         //Validation Error
@@ -96,12 +99,12 @@ class AccountUsersController extends Controller
     //Get Record from ID
     public function show($id)
     {
-        $accountUsers = AccountUser::find($id);
-        if ($accountUsers) {
-            $accountUsers = $accountUsers->load('account','transactions');
+        $accountUser = AccountUser::find($id);
+        if ($accountUser) {
+            $accountUser = $accountUser->load('account','transactions');
             return response()->json([
                 'message'            => 'Account User Information',
-                'account users'      => $accountUsers
+                'account users'      => $accountUser
             ]);
         } else {
             return response()->json([
@@ -115,7 +118,7 @@ class AccountUsersController extends Controller
     {
         $user = AccountUser::find($id);
         if ($user) {
-            AccountUser::find($id)->delete();
+            $user->delete();
             return response()->json([
                 'status'  => true,
                 'message' => 'Account User deleted successfully',

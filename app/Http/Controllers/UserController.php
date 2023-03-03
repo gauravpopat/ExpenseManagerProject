@@ -22,7 +22,7 @@ class UserController extends Controller
         //Validaton
         $validate = Validator::make($request->all(), [
             'old_password'          => 'required',
-            'password'              => 'required|confirmed|min:8',
+            'password'              => 'required|confirmed|min:8|max:40',
             'password_confirmation' => 'required'
         ]);
         //Validation Error
@@ -58,7 +58,7 @@ class UserController extends Controller
     public function userProfile()
     {
         $user = User::where('id',Auth::id())->first();
-        $user->load('accounts','usersOfAccounts','transactions');
+        $user->load('accounts','usersOfAccounts');
             return response()->json([
                 'message'           => 'User Profile',
                 'User Data'         => $user,

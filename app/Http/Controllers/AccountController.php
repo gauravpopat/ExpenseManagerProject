@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Account;
 use Illuminate\Support\Facades\Validator;
@@ -11,10 +12,10 @@ class AccountController extends Controller
 {
     public function list()
     {
-        $accounts = Account::all();
+        $accounts = User::find(auth()->user()->id)->load('accounts');
         return response()->json([
-            'message'   => 'Data',
-            'data'      => $accounts
+            'message'   => 'Accounts',
+            'accounts'  => $accounts
         ]);
     }
 
@@ -22,7 +23,7 @@ class AccountController extends Controller
     {
         $validationForAccount = Validator::make($request->all(), [
             'account_name'   => 'required|max:40|string',
-            'account_number' => 'required|numeric|unique:accounts,account_number',
+            'account_number' => 'required|numeric|digits:12|unique:accounts,account_number',
             'user_id'        => 'numeric|required|exists:users,id'
         ]);
 
@@ -44,11 +45,12 @@ class AccountController extends Controller
         ], 200);
     }
 
-    public function update($id, Request $request)
+    public function update(Request $request)
     {
         $validationForAccount = Validator::make($request->all(), [
+            'id'             => 'required|exists:accounts,id',
             'account_name'   => 'required|max:40|string',
-            'account_number' => 'required|numeric|unique:accounts,account_number',
+            'account_number' => 'required|numeric|digits:12|unique:accounts,account_number',
         ]);
 
         if ($validationForAccount->fails()) {
@@ -59,37 +61,27 @@ class AccountController extends Controller
             ]);
         }
 
-        $account = Account::find($id);
-        if ($account) {
-            $account->update($request->only(['account_name', 'account_number']));
-            return response()->json([
-                'status'    => true,
-                'message'   => 'Record Updated Successfully',
-            ]);
-        } else {
-            return response()->json([
-                'status'    => false,
-                'message'   => 'Record Not Found!',
-            ]);
-        }
+        Account::find($request->id)->update($request->only(['account_name', 'account_number']));
+        return response()->json([
+            'status'    => true,
+            'message'   => 'Record Updated Successfully',
+        ]);
     }
 
     public function show($id)
     {
         $account = Account::find($id);
-        if($account){
-            $account = $account->load('transactions','user','accountUsers');
+        if ($account) {
+            $account = $account->load('transactions', 'user', 'accountUsers');
             return response()->json([
                 'message'       => 'Account',
                 'account'       => $account
             ]);
-        }
-        else{
+        } else {
             return response()->json([
                 'message'   => 'Account not found',
             ]);
         }
-        
     }
 
     public function delete($id)
