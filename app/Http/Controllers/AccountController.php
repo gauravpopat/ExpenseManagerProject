@@ -21,7 +21,7 @@ class AccountController extends Controller
     public function insert(Request $request)
     {
         $validationForAccount = Validator::make($request->all(), [
-            'account_name'   => 'required|max:40|alpha',
+            'account_name'   => 'required|max:40|string',
             'account_number' => 'required|numeric|unique:accounts,account_number',
             'user_id'        => 'numeric|required|exists:users,id'
         ]);
@@ -40,14 +40,14 @@ class AccountController extends Controller
         return response()->json([
             'status'         => true,
             'message'        => 'Account Created Successfully',
-            'account'           => $account
+            'account'        => $account
         ], 200);
     }
 
     public function update($id, Request $request)
     {
         $validationForAccount = Validator::make($request->all(), [
-            'account_name'   => 'required|max:40|alpha',
+            'account_name'   => 'required|max:40|string',
             'account_number' => 'required|numeric|unique:accounts,account_number',
         ]);
 

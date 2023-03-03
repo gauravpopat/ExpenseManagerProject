@@ -62,5 +62,4 @@ Route::controller(AuthController::class)->prefix('user')->group(function () {
     Route::get('/verify-email/{email_verification_code}', 'verifyEmail')->name('verify-email');
     Route::post('/forgotpassword-link', 'forgotPasswordLink')->name('forgotpassword-link');
     Route::post('/forgot-password', 'forgotPassword')->name('forgot-password');
-    
 });

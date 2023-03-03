@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Mail\ResetPassword;
 use App\Mail\WelcomeMail;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -21,8 +22,8 @@ class AuthController extends Controller
     {
         //Validation
         $validateUser = Validator::make($request->all(), [
-            'first_name'    => 'required|max:40|alpha',
-            'last_name'     => 'required|max:40|alpha',
+            'first_name'    => 'required|max:40|string',
+            'last_name'     => 'required|max:40|string',
             'email'         => 'required|max:40|email|unique:users,email',
             'phone'         => 'required|regex:/[6-9][0-9]{9}/|unique:users,phone',
             'password'      => 'required|confirmed|min:8',
@@ -69,6 +70,7 @@ class AuthController extends Controller
         $validateUser   = Validator::make($request->all(), [
             'email'     => 'required|email|exists:users,email',
             'password'  => 'required',
+            // 'dummy'     => 'sometimes|required',
         ]);
 
         //Validation Error
@@ -145,7 +147,8 @@ class AuthController extends Controller
         $token = Str::random(64);
         PasswordReset::create($request->only(['email']) + [
             'token'         => $token,
-            'created_at'    => now()
+            'created_at'    => now(),
+            'expired_at'    => Carbon::now()->addDays(2)
         ]);
         $user['token'] = $token;
         if (Mail::to($user->email)->send(new ResetPassword($user))) {
@@ -182,15 +185,27 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
+
         if ($user) {
-            $user->update([
-                'password' => Hash::make($request->password),
-            ]);
-            return response()->json([
-                'status'  => true,
-                'message' => 'Password Updated Successfully.',
-            ]);
-        } else {
+            $expdate = PasswordReset::where('email',$request->email)->first();
+            if($expdate->expired_at > Carbon::now()){
+                $user->update([
+                    'password' => Hash::make($request->password),
+                ]);
+                PasswordReset::where('email',$request->email)->delete();
+                return response()->json([
+                    'status'  => true,
+                    'message' => 'Password Updated Successfully.',
+                ]);
+            }
+            else{
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Token Expired',
+                ]);
+            }
+        }
+        else {
             return response()->json([
                 'status'  => false,
                 'message' => 'User not found',

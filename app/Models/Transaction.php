@@ -30,7 +30,7 @@ class Transaction extends Model
 
     public function user()
     {
-        return $this->hasOneThrough(User::class,Account::class,'user_id','id');
+        return $this->hasManyThrough(User::class,Account::class,'user_id','id');
     }
     
 }

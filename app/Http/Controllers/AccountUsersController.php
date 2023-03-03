@@ -65,8 +65,8 @@ class AccountUsersController extends Controller
     public function update($id, Request $request)
     {
         $validationForAccount = Validator::make($request->all(), [
-            'first_name'   => 'required|max:40',
-            'last_name'    => 'required|max:40',
+            'first_name'   => 'required|max:40|string',
+            'last_name'    => 'required|max:40|string',
             'email'        => 'required|email|unique:account_users,email'
         ]);
 
