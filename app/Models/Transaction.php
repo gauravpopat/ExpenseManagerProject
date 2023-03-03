@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\AccountUser;
 
 class Transaction extends Model
 {
@@ -24,8 +25,7 @@ class Transaction extends Model
 
     public function accountUsers()
     {
-        return $this->belongsToMany(AccountUser::class);
+        return $this->belongsTo(AccountUser::class,'account_user_id');
     }
-
     
 }

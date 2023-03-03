@@ -10,6 +10,24 @@ use Illuminate\Support\Facades\Validator;
 
 class AccountUsersController extends Controller
 {
+    //Get list of Account_Users Table Records
+    public function list()
+    {
+        $accountUsers = AccountUser::all();
+        if ($accountUsers) {
+            $accountUsers = $accountUsers->load('account','transactions');
+            return response()->json([
+                'message'            => 'Account Users Data',
+                'account users'      => $accountUsers,
+            ]);
+        }
+        else{
+            return response()->json([
+                'message'   => 'No Account Users Data Found',
+            ]);
+        }
+    }
+
     //Account_Users Insert
     public function insert(Request $request)
     {
@@ -76,6 +94,21 @@ class AccountUsersController extends Controller
             ]);
         }
     }
+    //Get Record from ID
+    public function show($id)
+    {
+        $accountUser = AccountUser::find($id);
+        if ($accountUser) {
+            return response()->json([
+                'message'   => 'Account User',
+                'data'      => $accountUser
+            ]);
+        } else {
+            return response()->json([
+                'message'   => 'Account user not found'
+            ]);
+        }
+    }
 
     // Account_Users Delete Record
     public function delete($id)
@@ -91,32 +124,6 @@ class AccountUsersController extends Controller
             return response()->json([
                 'status'  => false,
                 'message' => 'User not found'
-            ]);
-        }
-    }
-
-    //Get list of Account_Users Table Records
-    public function list()
-    {
-        $accountUsers = AccountUser::all();
-        return response()->json([
-            'message'   => 'Account Users Data',
-            'data'      => $accountUsers
-        ]);
-    }
-
-    //Get Record from ID
-    public function show($id)
-    {
-        $accountUser = AccountUser::find($id);
-        if ($accountUser) {
-            return response()->json([
-                'message'   => 'Account User',
-                'data'      => $accountUser
-            ]);
-        } else {
-            return response()->json([
-                'message'   => 'Account user not found'
             ]);
         }
     }

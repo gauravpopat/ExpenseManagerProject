@@ -6,10 +6,44 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Account;
 use Illuminate\Support\Facades\Validator;
-use League\CommonMark\Extension\SmartPunct\EllipsesParser;
 
 class AccountController extends Controller
 {
+    public function list()
+    {
+        $accounts = Account::all();
+        return response()->json([
+            'message'   => 'Data',
+            'data'      => $accounts
+        ]);
+    }
+
+    public function insert(Request $request)
+    {
+        $validationForAccount = Validator::make($request->all(), [
+            'account_name'   => 'required|max:40|alpha',
+            'account_number' => 'required|numeric|unique:accounts,account_number',
+            'user_id'        => 'numeric|required|exists:users,id'
+        ]);
+
+        if ($validationForAccount->fails()) {
+            $errors = $validationForAccount->errors();
+            return response()->json([
+                'status'     => false,
+                'message'    => 'Validation Error',
+                'errors'     => $errors
+            ]);
+        }
+
+        $account = Account::create($request->only(['account_name', 'account_number', 'user_id']));
+
+        return response()->json([
+            'status'         => true,
+            'message'        => 'Account Created Successfully',
+            'account'           => $account
+        ], 200);
+    }
+
     public function update($id, Request $request)
     {
         $validationForAccount = Validator::make($request->all(), [
@@ -40,6 +74,23 @@ class AccountController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        $account = Account::find($id);
+        if($account){
+            return response()->json([
+                'message'   => 'Data',
+                'accounts'      => $account
+            ]);
+        }
+        else{
+            return response()->json([
+                'message'   => 'Account not found',
+            ]);
+        }
+        
+    }
+
     public function delete($id)
     {
         $account = Account::find($id);
@@ -64,55 +115,19 @@ class AccountController extends Controller
         }
     }
 
-    public function show($id)
+    public function accountDetails($id)
     {
         $account = Account::find($id);
-        if($account){
+        if ($account) {
+            $accountsDetail = $account->load('transactions','user','accountUsers');
             return response()->json([
-                'message'   => 'Data',
-                'accounts'      => $account
+                'message'           => 'Account Details',
+                'Account Data'      => $accountsDetail
+            ]);
+        } else {
+            return response()->json([
+                'message'           => 'Account Not Found',
             ]);
         }
-        else{
-            return response()->json([
-                'message'   => 'Account not found',
-            ]);
-        }
-        
-    }
-
-    public function insert(Request $request)
-    {
-        $validationForAccount = Validator::make($request->all(), [
-            'account_name'   => 'required|max:40|alpha',
-            'account_number' => 'required|numeric|unique:accounts,account_number',
-            'user_id'        => 'numeric|required|exists:users,id'
-        ]);
-
-        if ($validationForAccount->fails()) {
-            $errors = $validationForAccount->errors();
-            return response()->json([
-                'status'     => false,
-                'message'    => 'Validation Error',
-                'errors'     => $errors
-            ]);
-        }
-
-        $account = Account::create($request->only(['account_name', 'account_number', 'user_id']));
-
-        return response()->json([
-            'status'         => true,
-            'message'        => 'Account Created Successfully',
-            'account'           => $account
-        ], 200);
-    }
-
-    public function list()
-    {
-        $accounts = Account::all();
-        return response()->json([
-            'message'   => 'Data',
-            'data'      => $accounts
-        ]);
     }
 }

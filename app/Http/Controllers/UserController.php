@@ -17,120 +17,14 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function create(Request $request)
+    public function changePassword(Request $request)
     {
-        //Validation
-        $validateUser = Validator::make($request->all(), [
-            'first_name'    => 'required|max:40|alpha',
-            'last_name'     => 'required|max:40|alpha',
-            'email'         => 'required|max:40|email|unique:users,email',
-            'phone'         => 'required|regex:/[6-9][0-9]{9}/|unique:users,phone',
-            'password'      => 'required|confirmed|min:8',
-        ]);
-
-        //Validation Error
-        if ($validateUser->fails()) {
-            $errors = $validateUser->errors();
-            return response()->json([
-                'message'   => 'Validation Error',
-                'error'     => $errors
-            ]);
-        }
-
-        $user = User::create($request->only(['first_name', 'last_name', 'email', 'phone']) + [
-            'password'                  => Hash::make($request->password),
-            'email_verification_code'   => Str::random(40),
-            'remember_token'            => Str::random(10)
-        ]);
-
-        //Default Account
-
-        Account::create([
-            'account_name'    => $user->first_name . " " . $user->last_name,
-            'account_number'  => fake()->unique()->numerify('##########'),
-            'is_default'      => true,
-            'user_id'         => $user->id
-        ]);
-
-        //Welcome Mail
-        Mail::to($user->email)->send(new WelcomeMail($user));
-        //Response
-        $apiToken = $user->createToken("API TOKEN")->plainTextToken;
-        return response()->json([
-            'status'    => true,
-            'message'   => 'User Created Successfully',
-            'token'     => $apiToken
-        ], 200);
-    }
-
-    public function login(Request $request)
-    {
-        //Validation
-        $validateUser   = Validator::make($request->all(), [
-            'email'     => 'required|email|exists:users,email',
-            'password'  => 'required',
-        ]);
-
-        //Validation Error
-        if ($validateUser->fails()) {
-            $errors = $validateUser->errors();
-            return response()->json([
-                'message'   => 'Validation Error',
-                'error'     => $errors
-            ]);
-        }
-
-        $user = User::where('email', $request->email)->first();
-
-        if ($user->is_onboarded == false) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Email Not Verified!'
-            ]);
-        } else {
-            // Checking user entered details
-            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-                $apiToken = $user->createToken("API TOKEN")->plainTextToken;
-                return response()->json([
-                    'status'    => true,
-                    'message'   => 'Login Successfully',
-                    'token'     => $apiToken
-                ], 200);
-            } else {
-                return response()->json([
-                    'status'    => false,
-                    'message'   => 'Password Incorrect'
-                ]);
-            }
-        }
-    }
-
-    public function verifyEmail($verificaton_code)
-    {
-        $user = User::where('email_verification_code', $verificaton_code)->first();
-
-        if ($user) {
-            $user->update([
-                'is_onboarded'      => true,
-                'email_verified_at' => now()
-            ]);
-            return response()->json([
-                'message'           => 'Verification Successfull'
-            ]);
-        } else {
-            return response()->json([
-                'message'           => 'User not found'
-            ]);
-        }
-    }
-
-    public function forgotPasswordLink(Request $request)
-    {
-        //Validation
+        //Validaton
         $validate = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users'
+            'old_password'          => 'required',
+            'password'              => 'required|confirmed|min:8',
+            'password_confirmation' => 'required'
         ]);
-
         //Validation Error
         if ($validate->fails()) {
             $errors = $validate->errors();
@@ -141,59 +35,38 @@ class UserController extends Controller
             ]);
         }
 
-        $user = User::where('email', $request->email)->first();
-        $token = Str::random(64);
-        PasswordReset::create($request->only(['email']) + [
-            'token'         => $token,
-            'created_at'    => now()
-        ]);
-        $user['token'] = $token;
-        if (Mail::to($user->email)->send(new ResetPassword($user))) {
+        //Change Password
+
+        $user = User::where('id', auth()->user()->id)->first();
+
+        if (Hash::check($request->old_password, $user->password)) {
+            $user->update([
+                'password'  => Hash::make($request->password)
+            ]);
             return response()->json([
-                'status'  => true,
-                'message' => 'Email Sent!',
+                'status'    => true,
+                'message'   => 'Password Changed Successfully'
             ]);
         } else {
             return response()->json([
                 'status'  => false,
-                'message' => 'Some problem!',
+                'message' => 'Old Password Not Matched.'
             ]);
         }
     }
-
-    public function forgotPassword(Request $request)
+    
+    public function userProfile()
     {
-        //Validation
-        $validate = Validator::make($request->all(), [
-            'email'                 => 'required|email|exists:password_resets,email',
-            'password'              => 'required|confirmed|min:8',
-            'password_confirmation' => 'required',
-            'token'                 => 'required|exists:password_resets,token'
-        ]);
-
-        //Validation Error
-        if ($validate->fails()) {
-            $errors = $validate->errors();
-            return response()->json([
-                'status'  => false,
-                'message' => 'Validation Error',
-                'error'   => $errors
-            ]);
-        }
-
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('id',Auth::id())->first();
         if ($user) {
-            $user->update([
-                'password' => Hash::make($request->password),
-            ]);
+            $userProfile = $user->load('accounts','usersOfAccounts','transactions');
             return response()->json([
-                'status'  => true,
-                'message' => 'Password Updated Successfully.',
+                'message'           => 'User Profile',
+                'User Data'         => $userProfile,
             ]);
         } else {
             return response()->json([
-                'status'  => false,
-                'message' => 'User not found',
+                'message'           => 'User Not Found',
             ]);
         }
     }

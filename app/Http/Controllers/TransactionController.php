@@ -9,6 +9,24 @@ use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
 {
+    //Get list of Transaction Table Records
+    public function list()
+    {
+        $transactions = Transaction::all();
+        if ($transactions) {
+            $transactions = $transactions->load('account','accountUsers');
+            return response()->json([
+                'message'            => 'Transaction Data',
+                'transaction'        => $transactions,
+            ]);
+        }
+        else{
+            return response()->json([
+                'message'   => 'No transaction Data Found',
+            ]);
+        }
+    }
+
     //Insert
     public function insert(Request $request)
     {
@@ -40,7 +58,6 @@ class TransactionController extends Controller
         ], 200);
     }
 
-
     //Update
     public function update($id, Request $request)
     {
@@ -57,34 +74,6 @@ class TransactionController extends Controller
                 'message'  => 'Transaction not found',
             ]);
         }
-    }
-
-    //Delete record from transaction
-    public function delete($id)
-    {
-        $transaction = Transaction::find($id);
-        if ($transaction) {
-            Transaction::find($id)->delete();
-            return response()->json([
-                'status'    => true,
-                'message'   => 'Transaction Deleted Successfully',
-            ]);
-        } else {
-            return response()->json([
-                'status'    => false,
-                'message'   => 'Transaction not found',
-            ]);
-        }
-    }
-
-    //Get list of Transaction Table Records
-    public function list()
-    {
-        $transactions = Transaction::all();
-        return response()->json([
-            'message'   => 'Transactions',
-            'data'      => $transactions
-        ]);
     }
 
     //Get Record from ID
@@ -105,4 +94,24 @@ class TransactionController extends Controller
         }
         
     }
+
+    //Delete record from transaction
+    public function delete($id)
+    {
+        $transaction = Transaction::find($id);
+        if ($transaction) {
+            Transaction::find($id)->delete();
+            return response()->json([
+                'status'    => true,
+                'message'   => 'Transaction Deleted Successfully',
+            ]);
+        } else {
+            return response()->json([
+                'status'    => false,
+                'message'   => 'Transaction not found',
+            ]);
+        }
+    }
+
+    
 }
