@@ -50,11 +50,11 @@ class AuthController extends Controller
             ]);
         }
     }
-    public function userProfile($id)
+    public function userProfile()
     {
-        $user = User::find($id);
+        $user = User::where('id',Auth::id())->first();
         if ($user) {
-            $userProfile = $user->with('accounts', 'usersOfAccounts', 'transactions')->find($id);
+            $userProfile = $user->with('accounts', 'usersOfAccounts', 'transactions')->find(Auth::id());
             return response()->json([
                 'message'           => 'User Profile',
                 'User Data'         => $userProfile,
@@ -80,5 +80,15 @@ class AuthController extends Controller
                 'message'           => 'Account Not Found',
             ]);
         }
+    }
+
+    public function getAccountOfLoggedInUsers()
+    {
+        $userid = Auth::id();
+        $account = User::with('accounts')->find($userid);
+        return response()->json([
+            'message'           => 'Accounts of Logged in Users',
+            'accounts'          => $account
+        ]);
     }
 }

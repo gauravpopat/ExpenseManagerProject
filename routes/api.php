@@ -49,8 +49,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // User Auth
     Route::controller(AuthController::class)->prefix('user')->group(function () {
         Route::post('change-password', 'changePassword')->name('change-password');
-        Route::get('user-profile/{id}', 'userProfile')->name('user-profile');
+        Route::get('user-profile', 'userProfile')->name('user-profile');
         Route::get('account-details/{id}', 'accountDetails')->name('account-detail');
+        Route::get('accounts-of-loggedin-users','getAccountOfLoggedInUsers')->name('accounts-of-loggedin-users');
     });
 });
 
