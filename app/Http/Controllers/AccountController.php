@@ -80,8 +80,8 @@ class AccountController extends Controller
         if($account){
             $account = $account->load('transactions','user','accountUsers');
             return response()->json([
-                'message'   => 'Data',
-                'accounts'      => $account
+                'message'       => 'Account',
+                'account'       => $account
             ]);
         }
         else{
