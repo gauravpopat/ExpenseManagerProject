@@ -58,16 +58,10 @@ class UserController extends Controller
     public function userProfile()
     {
         $user = User::where('id',Auth::id())->first();
-        if ($user) {
-            $userProfile = $user->load('accounts','usersOfAccounts','transactions');
+        $user->load('accounts','usersOfAccounts','transactions');
             return response()->json([
                 'message'           => 'User Profile',
-                'User Data'         => $userProfile,
+                'User Data'         => $user,
             ]);
-        } else {
-            return response()->json([
-                'message'           => 'User Not Found',
-            ]);
-        }
     }
 }
