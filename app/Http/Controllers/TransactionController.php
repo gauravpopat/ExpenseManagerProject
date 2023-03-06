@@ -14,7 +14,7 @@ class TransactionController extends Controller
     use ResponseTrait;
     public function list()
     {
-        $user = User::where('id', Auth()->user()->id)->get();
+        $user = User::where('id', auth()->user()->id)->get();
         $transactions = $user->load('transactions','accountUsers','accounts');
         if ($transactions) {
             return $this->returnResponse(true, "Transaction Record", $transactions);
