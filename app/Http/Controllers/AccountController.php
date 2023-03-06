@@ -13,7 +13,7 @@ class AccountController extends Controller
     use ResponseTrait;
     public function list()
     {
-        $accounts = Account::where('user_id',auth()->user()->id)->first()->load('userAccounts','transactions');
+        $accounts = Account::where('user_id',auth()->user()->id)->first()->load('accountUsers','transactions');
         return $this->returnResponse(true,"Accounts",$accounts);
     }
 

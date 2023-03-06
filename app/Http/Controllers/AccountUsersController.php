@@ -17,7 +17,7 @@ class AccountUsersController extends Controller
     public function list()
     {
         $account = Account::where('user_id',auth()->user()->id)->first();
-        $accountUser = AccountUser::where('account_id', $account->id)->first()->load('transactions','account');
+        $accountUser = AccountUser::where('account_id', $account->id)->first()->load('transactions','accounts');
         if ($accountUser) {
             return $this->returnResponse(true, "Account Users Information",$accountUser);
         } else {

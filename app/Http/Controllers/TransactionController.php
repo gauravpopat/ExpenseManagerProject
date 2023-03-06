@@ -15,7 +15,7 @@ class TransactionController extends Controller
     public function list()
     {
         $user = User::where('id', Auth()->user()->id)->get();
-        $transactions = $user->load('transactions','userAccounts','accounts');
+        $transactions = $user->load('transactions','accountUsers','accounts');
         if ($transactions) {
             return $this->returnResponse(true, "Transaction Record", $transactions);
         } else {

@@ -41,7 +41,7 @@ class UserController extends Controller
     
     public function userProfile()
     {
-        $user = User::where('id',Auth::id())->first()->load('accounts','userAccounts','transactions');
+        $user = User::where('id',Auth::id())->first()->load('accounts','accountUsers','transactions');
         return $this->returnResponse(true,"User Profile",$user);
     }
 }
