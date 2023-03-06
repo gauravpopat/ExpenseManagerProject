@@ -14,11 +14,11 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Models\PasswordReset;
 use Illuminate\Http\Request;
-use App\Http\Traits\ValidationTrait;
+use App\Http\Traits\ResponseTrait;
 
 class UserController extends Controller
 {
-    use ValidationTrait;
+    use ResponseTrait;
     public function changePassword(Request $request)
     {
         //Validaton
@@ -38,15 +38,9 @@ class UserController extends Controller
             $user->update([
                 'password'  => Hash::make($request->password)
             ]);
-            return response()->json([
-                'status'    => true,
-                'message'   => 'Password Changed Successfully'
-            ]);
+            $this->returnResponse(true,"Password Changed Successfully");
         } else {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Old Password Not Matched.'
-            ]);
+            $this->returnResponse(false,"Old Password Not Matched.");
         }
     }
     

@@ -7,57 +7,45 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\AccountUser;
 use App\Models\Account;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Traits\ValidationTrait;
+use App\Http\Traits\ResponseTrait;
 
 class AccountUsersController extends Controller
 {
-    use ValidationTrait;
+    use ResponseTrait;
     //Get list of Account_Users Table Records
     public function list()
     {
         $account = Account::where('user_id', Auth()->user()->id)->get();
         $accountUser = $account->load('accountUsers');
         if ($accountUser) {
-            return response()->json([
-                'message'            => 'Account Users',
-                'account users'      => $accountUser,
-            ]);
+            return $this->returnResponse(true, "Account Users",$accountUser);
         } else {
-            return response()->json([
-                'message'   => 'No Account Users Data Found',
-            ]);
+            return $this->returnResponse(false, "No Account Users Data Found");
         }
     }
 
     //Account_Users Insert
     public function insert(Request $request)
     {
-        //Validation
         $validation = Validator::make($request->all(), [
             'email'                 => 'required|email|max:40|exists:users,email',
             'account_id'            => 'required|numeric|digits:12|exists:accounts,id'
         ]);
 
-        $this->ValidationErrorsResponse($validation);
+        if($validation->fails())
+            return $this->ValidationErrorsResponse($validation);
 
-        //no need to add if($user) because of validation
         $user = User::where('email', $request->email)->first();
 
-        $account_users = AccountUser::create($request->only(['email', 'account_id']) + [
+        AccountUser::create($request->only(['email', 'account_id']) + [
             'first_name' => $user->first_name,
             'last_name'  => $user->last_name
         ]);
 
-        return response()->json([
-            'status'            => true,
-            'message'           => 'Inserted Successfully',
-            'data'              => $account_users
-        ], 200);
+        return $this->returnResponse(true, "Account User Inserted Successfully...");
     }
 
-    // Account_Users Update
     public function update(Request $request)
     {
         $validation = Validator::make($request->all(), [
@@ -66,36 +54,28 @@ class AccountUsersController extends Controller
             'last_name'    => 'required|max:40|string',
             'email'        => 'required|email|max:40|unique:account_users,email'
         ]);
-
-        $this->ValidationErrorsResponse($validation);
+        if($validation->fails())
+            return $this->ValidationErrorsResponse($validation);
 
         $user = AccountUser::findOrFail($request->id);
 
         $user->update($request->only(['first_name', 'last_name', 'email']));
-        return response()->json([
-            'status'  => true,
-            'message' => 'Data Updated Successfully',
-        ]);
+        
+        return $this->returnResponse(true, "Record Updated Successfully...");
+
     }
-    //Get Record from ID
+    
     public function show($id)
     {
         $accountUser = AccountUser::findOrFail($id);
         $accountUser = $accountUser->load('account', 'transactions');
-        return response()->json([
-            'message'            => 'Account User Information',
-            'account users'      => $accountUser
-        ]);
+        return $this->returnResponse(true, "Account User Information",$accountUser);
     }
 
-    // Account_Users Delete Record
     public function delete($id)
     {
         $user = AccountUser::findOrFail($id);
         $user->delete();
-        return response()->json([
-            'status'  => true,
-            'message' => 'Account User deleted successfully',
-        ]);
+        return $this->returnResponse(true, "Account User Deleted Successfully...");
     }
 }

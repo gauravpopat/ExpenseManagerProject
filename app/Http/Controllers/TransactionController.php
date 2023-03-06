@@ -8,12 +8,11 @@ use Illuminate\Http\Request;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Traits\ValidationTrait;
+use App\Http\Traits\ResponseTrait;
 
 class TransactionController extends Controller
 {
-    use ValidationTrait;
-    //Get list of Transaction Table Records
+    use ResponseTrait;
     public function list()
     {
         $user = User::where('id', Auth()->user()->id)->get();
@@ -24,9 +23,7 @@ class TransactionController extends Controller
                 'transaction'        => $transactions,
             ]);
         } else {
-            return response()->json([
-                'message'   => 'No transaction Data Found',
-            ]);
+            $this->returnResponse(false,"No Transaction Data!!");
         }
     }
 
@@ -43,14 +40,9 @@ class TransactionController extends Controller
         ]);
 
         $this->ValidationErrorsResponse($validation);
-
         //Insert
-        $transaction = Transaction::create($request->only(['type', 'category', 'amount', 'account_user_id', 'account_id']));
-        return response()->json([
-            'status'            => true,
-            'message'           => 'Inserted Successfully',
-            'data'              => $transaction
-        ], 200);
+        Transaction::create($request->only(['type', 'category', 'amount', 'account_user_id', 'account_id']));
+        $this->returnResponse(true,"Inserted Successfully");
     }
 
     //Update
@@ -66,12 +58,8 @@ class TransactionController extends Controller
 
         $this->ValidationErrorsResponse($validation);
 
-        $transaction = Transaction::findOrFail($request->id);
-        $transaction->update($request->only('type', 'category', 'amount'));
-        return response()->json([
-            'status'   => true,
-            'message'  => 'Data Updated Successfully',
-        ]);
+        Transaction::findOrFail($request->id)->update($request->only('type', 'category', 'amount'));
+        $this->returnResponse(true,"Data Updated Successfully");
     }
 
     //Get Record from ID
@@ -89,9 +77,6 @@ class TransactionController extends Controller
     public function delete($id)
     {
         Transaction::findOrFail($id)->delete();
-        return response()->json([
-            'status'    => true,
-            'message'   => 'Transaction Deleted Successfully',
-        ]);
+        $this->returnResponse(true,"Transaction Deleted Successfully");
     }
 }

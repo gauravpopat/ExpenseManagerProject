@@ -14,15 +14,14 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Models\PasswordReset;
 use Illuminate\Http\Request;
-use App\Http\Traits\ValidationTrait;
+use App\Http\Traits\ResponseTrait;
 
 
 class AuthController extends Controller
 {
-    use ValidationTrait;
+    use ResponseTrait;
     public function create(Request $request)
     {
-        //Validation
         $validation = Validator::make($request->all(), [
             'first_name'            => 'required|max:40|string',
             'last_name'             => 'required|max:40|string',
@@ -51,6 +50,7 @@ class AuthController extends Controller
 
         //Welcome Mail
         Mail::to($user->email)->send(new WelcomeMail($user));
+
         //Response
         $apiToken = $user->createToken("API TOKEN")->plainTextToken;
         return response()->json([
@@ -74,10 +74,7 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user->is_onboarded == false) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Email Not Verified!'
-            ]);
+            $this->returnResponse(false, "Email not verified...");
         } else {
             // Checking user entered details
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
@@ -88,10 +85,7 @@ class AuthController extends Controller
                     'token'     => $apiToken
                 ], 200);
             } else {
-                return response()->json([
-                    'status'    => false,
-                    'message'   => 'Password Incorrect'
-                ]);
+                $this->returnResponse(false, "Password Incorrect");
             }
         }
     }
@@ -105,13 +99,9 @@ class AuthController extends Controller
                 'is_onboarded'      => true,
                 'email_verified_at' => now()
             ]);
-            return response()->json([
-                'message'           => 'Verification Successful'
-            ]);
+            $this->returnResponse(true, "Verification Successfull");
         } else {
-            return response()->json([
-                'message'           => 'User not found'
-            ]);
+            $this->returnResponse(false, "User not found");
         }
     }
 
@@ -125,23 +115,21 @@ class AuthController extends Controller
         $this->ValidationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
+
         $token = Str::random(64);
+
         PasswordReset::create($request->only(['email']) + [
             'token'         => $token,
             'created_at'    => now(),
             'expired_at'    => Carbon::now()->addDays(2)
         ]);
+
         $user['token'] = $token;
+        
         if (Mail::to($user->email)->send(new ResetPassword($user))) {
-            return response()->json([
-                'status'  => true,
-                'message' => 'Email Sent!',
-            ]);
+            $this->returnResponse(true,"Email Sent!");
         } else {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Some problem!',
-            ]);
+            $this->returnResponse(true,"Email Not Sent!");
         }
     }
 
@@ -166,23 +154,14 @@ class AuthController extends Controller
                     'password' => Hash::make($request->password),
                 ]);
                 $passwordReset->delete();
-                return response()->json([
-                    'status'  => true,
-                    'message' => 'Password Updated Successfully.',
-                ]);
+                $this->returnResponse(true,"Password Updated Successfully");
             }
             else{
-                return response()->json([
-                    'status'  => false,
-                    'message' => 'Token Expired',
-                ]);
+                $this->returnResponse(false,"Token Expired");
             }
         }
         else {
-            return response()->json([
-                'status'  => false,
-                'message' => 'User not found',
-            ]);
+            $this->returnResponse(false,"User not found!");
         }
     }
     

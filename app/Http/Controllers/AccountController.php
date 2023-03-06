@@ -7,18 +7,15 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Account;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Traits\ValidationTrait;
+use App\Http\Traits\ResponseTrait;
 
 class AccountController extends Controller
 {
-    use ValidationTrait;
+    use ResponseTrait;
     public function list()
     {
         $accounts = User::findOrFail(auth()->user()->id)->load('accounts');
-        return response()->json([
-            'message'   => 'Accounts',
-            'accounts'  => $accounts
-        ]);
+        return $this->returnResponse(true,"Accounts",$accounts);
     }
 
     public function insert(Request $request)
@@ -29,15 +26,12 @@ class AccountController extends Controller
             'user_id'        => 'numeric|required|exists:users,id'
         ]);
 
-        $this->ValidationErrorsResponse($validation);
+        if ($validation->fails())
+            return $this->ValidationErrorsResponse($validation);
 
-        $account = Account::create($request->only(['account_name', 'account_number', 'user_id']));
+        Account::create($request->only(['account_name', 'account_number', 'user_id']));
 
-        return response()->json([
-            'status'         => true,
-            'message'        => 'Account Created Successfully',
-            'account'        => $account
-        ], 200);
+        return $this->returnResponse(true, "Account Created Successfully");
     }
 
     public function update(Request $request)
@@ -48,39 +42,29 @@ class AccountController extends Controller
             'account_number' => 'required|numeric|digits:12|unique:accounts,account_number',
         ]);
 
-        $this->ValidationErrorsResponse($validation);
+        if($validation->fails())
+            return $this->ValidationErrorsResponse($validation);
 
         Account::findOrFail($request->id)->update($request->only(['account_name', 'account_number']));
-        return response()->json([
-            'status'    => true,
-            'message'   => 'Record Updated Successfully',
-        ]);
+
+        return $this->returnResponse(true, "Record Updated Successfully");
     }
 
     public function show($id)
     {
         $account = Account::findOrFail($id);
         $account = $account->load('transactions', 'user', 'accountUsers');
-        return response()->json([
-            'message'       => 'Account',
-            'account'       => $account
-        ]);
+        return $this->returnResponse(true, "Account", $account);
     }
 
     public function delete($id)
     {
         $account = Account::findOrFail($id);
         if ($account->is_default == true) {
-            return response()->json([
-                'status'    => false,
-                'message'   => 'Deletation not allowed for default account'
-            ]);
+            return $this->returnResponse(false, "Deletation not allowed for default account");
         } else {
             $account->delete();
-            return response()->json([
-                'status'    => true,
-                'message'   => 'Account Deleted Successfully...'
-            ]);
+            return $this->returnResponse(true, "Account Deleted Successfully...");
         }
     }
 }
