@@ -38,7 +38,7 @@ class AccountController extends Controller
         $validation = Validator::make($request->all(), [
             'id'             => 'required|exists:accounts,id',
             'account_name'   => 'required|max:40|string',
-            'account_number' => 'required|numeric|digits:12|unique:accounts,account_number',
+            'account_number' => 'required|numeric|digits:12|unique:accounts,account_number,'.$request->id
         ]);
 
         if($validation->fails())
