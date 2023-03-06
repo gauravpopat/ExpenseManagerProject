@@ -23,19 +23,18 @@ class UserController extends Controller
         ]);
         
         if($validation->fails())
-            $this->ValidationErrorsResponse($validation);
+            return $this->ValidationErrorsResponse($validation);
 
         //Change Password
 
         $user = User::where('id', auth()->user()->id)->first();
-
         if (Hash::check($request->old_password, $user->password)) {
             $user->update([
                 'password'  => Hash::make($request->password)
             ]);
-            $this->returnResponse(true,"Password Changed Successfully");
+            return $this->returnResponse(true,"Password Changed Successfully");
         } else {
-            $this->returnResponse(false,"Old Password Not Matched.");
+            return $this->returnResponse(false,"Old Password Not Matched.");
         }
     }
     

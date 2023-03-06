@@ -73,7 +73,7 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user->is_onboarded == false) {
-            $this->returnResponse(false, "Email not verified...");
+            return $this->returnResponse(false, "Email not verified...");
         } else {
             // Checking user entered details
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {

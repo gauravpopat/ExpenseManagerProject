@@ -13,7 +13,7 @@ use App\Http\Traits\ResponseTrait;
 class AccountUsersController extends Controller
 {
     use ResponseTrait;
-    //Get list of Account_Users Table Records
+    
     public function list()
     {
         $account = Account::where('user_id',auth()->user()->id)->first();

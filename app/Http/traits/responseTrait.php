@@ -23,7 +23,7 @@ trait ResponseTrait {
         if($data == null){
             return response()->json([
                 'status'   => $status,
-                'message'  => $message,
+                'message'  => $message
             ]);
         }
     }
