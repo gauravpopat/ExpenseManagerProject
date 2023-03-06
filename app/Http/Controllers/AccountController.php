@@ -59,7 +59,7 @@ class AccountController extends Controller
     {
         $account = Account::findOrFail($id);
         if ($account->is_default == true) {
-            return $this->returnResponse(false, "Deletation not allowed for default account");
+            return $this->returnResponse(false, "Default account can not be delete!");
         } else {
             $account->delete();
             return $this->returnResponse(true, "Account Deleted Successfully...");
