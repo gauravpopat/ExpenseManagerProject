@@ -56,7 +56,7 @@ class User extends Authenticatable
         return $this->hasMany(Account::class);
     }
 
-    public function userAccount()
+    public function userAccounts()
     {
         return $this->hasManyThrough(AccountUser::class,Account::class);
     }

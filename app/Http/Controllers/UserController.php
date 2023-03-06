@@ -2,17 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\ResetPassword;
-use App\Mail\WelcomeMail;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Account;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
-use App\Models\PasswordReset;
 use Illuminate\Http\Request;
 use App\Http\Traits\ResponseTrait;
 
@@ -47,8 +41,7 @@ class UserController extends Controller
     
     public function userProfile()
     {
-        $user = User::where('id',Auth::id())->first();
-        $user->load('accounts','usersOfAccounts');
+        $user = User::where('id',Auth::id())->first()->load('accounts','userAccounts','transactions');
         return $this->returnResponse(true,"User Profile",$user);
     }
 }

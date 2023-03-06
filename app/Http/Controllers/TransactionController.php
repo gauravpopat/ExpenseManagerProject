@@ -16,11 +16,11 @@ class TransactionController extends Controller
     public function list()
     {
         $user = User::where('id', Auth()->user()->id)->get();
-        $transactions = $user->load('transactions');
+        $transactions = $user->load('transactions','userAccounts','accounts');
         if ($transactions) {
-            return $this->returnResponse(true,"Transaction Record",$transactions);
+            return $this->returnResponse(true, "Transaction Record", $transactions);
         } else {
-            return $this->returnResponse(false,"No Transaction Data!!");
+            return $this->returnResponse(false, "No Transaction Data!!");
         }
     }
 
@@ -35,11 +35,11 @@ class TransactionController extends Controller
             'account_user_id'       => 'required|numeric|exists:account_users,id',
             'account_id'            => 'required|numeric|exists:accounts,id'
         ]);
-        if($validation->fails())
+        if ($validation->fails())
             return $this->ValidationErrorsResponse($validation);
         //Insert
         Transaction::create($request->only(['type', 'category', 'amount', 'account_user_id', 'account_id']));
-        return $this->returnResponse(true,"Inserted Successfully");
+        return $this->returnResponse(true, "Inserted Successfully");
     }
 
     //Update
@@ -53,25 +53,24 @@ class TransactionController extends Controller
             'amount'                => 'required|numeric'
         ]);
 
-        if($validation->fails())
+        if ($validation->fails())
             return $this->ValidationErrorsResponse($validation);
 
         Transaction::findOrFail($request->id)->update($request->only('type', 'category', 'amount'));
-        return $this->returnResponse(true,"Data Updated Successfully");
+        return $this->returnResponse(true, "Data Updated Successfully");
     }
 
     //Get Record from ID
     public function show($id)
     {
         $transactions = Transaction::findOrFail($id);
-        $transactions = $transactions->load('account', 'accountUsers');
-        return $this->returnResponse(true,"Transaction Data",$transactions);
+        return $this->returnResponse(true, "Transaction Data", $transactions);
     }
 
     //Delete record from transaction
     public function delete($id)
     {
         Transaction::findOrFail($id)->delete();
-        return $this->returnResponse(true,"Transaction Deleted Successfully");
+        return $this->returnResponse(true, "Transaction Deleted Successfully");
     }
 }

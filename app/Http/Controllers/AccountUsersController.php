@@ -16,10 +16,10 @@ class AccountUsersController extends Controller
     //Get list of Account_Users Table Records
     public function list()
     {
-        $account = Account::where('user_id', Auth()->user()->id)->get();
-        $accountUser = $account->load('accountUsers');
+        $account = Account::where('user_id',auth()->user()->id)->first();
+        $accountUser = AccountUser::where('account_id', $account->id)->first()->load('transactions','account');
         if ($accountUser) {
-            return $this->returnResponse(true, "Account Users",$accountUser);
+            return $this->returnResponse(true, "Account Users Information",$accountUser);
         } else {
             return $this->returnResponse(false, "No Account Users Data Found");
         }
@@ -68,14 +68,12 @@ class AccountUsersController extends Controller
     public function show($id)
     {
         $accountUser = AccountUser::findOrFail($id);
-        $accountUser = $accountUser->load('account', 'transactions');
         return $this->returnResponse(true, "Account User Information",$accountUser);
     }
 
     public function delete($id)
     {
-        $user = AccountUser::findOrFail($id);
-        $user->delete();
+        AccountUser::findOrFail($id)->delete();
         return $this->returnResponse(true, "Account User Deleted Successfully...");
     }
 }

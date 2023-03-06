@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Mail\ResetPassword;
 use App\Mail\WelcomeMail;
 use Illuminate\Support\Carbon;
@@ -31,7 +32,7 @@ class AuthController extends Controller
             'password_confirmation' => 'required'
         ]);
 
-        if($validation->fails())
+        if ($validation->fails())
             return $this->ValidationErrorsResponse($validation);
 
         $user = User::create($request->only(['first_name', 'last_name', 'email', 'phone']) + [
@@ -54,7 +55,7 @@ class AuthController extends Controller
 
         //Response
         $apiToken = $user->createToken("API TOKEN")->plainTextToken;
-        return $this->returnResponse(true,"User Created Successfully",$apiToken);
+        return $this->returnResponse(true, "User Created Successfully", $apiToken);
     }
 
     public function login(Request $request)
@@ -66,7 +67,7 @@ class AuthController extends Controller
             // 'dummy'     => 'sometimes|required',
         ]);
 
-        if($validation->fails())
+        if ($validation->fails())
             return $this->ValidationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
@@ -77,7 +78,7 @@ class AuthController extends Controller
             // Checking user entered details
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                 $apiToken = $user->createToken("API TOKEN")->plainTextToken;
-                return $this->returnResponse(true,"Login Successfully",$apiToken);
+                return $this->returnResponse(true, "Login Successfully", $apiToken);
             } else {
                 return $this->returnResponse(false, "Password Incorrect");
             }
@@ -87,7 +88,6 @@ class AuthController extends Controller
     public function verifyEmail($verificaton_code)
     {
         $user = User::where('email_verification_code', $verificaton_code)->first();
-
         if ($user) {
             $user->update([
                 'is_onboarded'      => true,
@@ -106,7 +106,7 @@ class AuthController extends Controller
             'email' => 'required|email|exists:users'
         ]);
 
-        if($validation->fails())
+        if ($validation->fails())
             return $this->ValidationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
@@ -120,11 +120,11 @@ class AuthController extends Controller
         ]);
 
         $user['token'] = $token;
-        
+
         if (Mail::to($user->email)->send(new ResetPassword($user))) {
-            return $this->returnResponse(true,"Email Sent!");
+            return $this->returnResponse(true, "Email Sent!");
         } else {
-            return $this->returnResponse(true,"Email Not Sent!");
+            return $this->returnResponse(true, "Email Not Sent!");
         }
     }
 
@@ -138,27 +138,24 @@ class AuthController extends Controller
             'token'                 => 'required|exists:password_resets,token'
         ]);
 
-        if($validation->fails())
+        if ($validation->fails())
             return $this->ValidationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
 
         if ($user) {
-            $passwordReset = PasswordReset::where('email',$request->email)->first();
-            if($passwordReset->expired_at > Carbon::now()){
+            $passwordReset = PasswordReset::where('email', $request->email)->first();
+            if ($passwordReset->expired_at > Carbon::now()) {
                 $user->update([
                     'password' => Hash::make($request->password),
                 ]);
                 $passwordReset->delete();
-                return $this->returnResponse(true,"Password Updated Successfully");
+                return $this->returnResponse(true, "Password Updated Successfully");
+            } else {
+                return $this->returnResponse(false, "Token Expired");
             }
-            else{
-                return $this->returnResponse(false,"Token Expired");
-            }
-        }
-        else {
-           return $this->returnResponse(false,"User not found!");
+        } else {
+            return $this->returnResponse(false, "User not found!");
         }
     }
-    
 }

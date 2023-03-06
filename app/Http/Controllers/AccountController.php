@@ -14,7 +14,7 @@ class AccountController extends Controller
     use ResponseTrait;
     public function list()
     {
-        $accounts = User::findOrFail(auth()->user()->id)->load('accounts');
+        $accounts = Account::where('user_id',auth()->user()->id)->first()->load('userAccounts','transactions');
         return $this->returnResponse(true,"Accounts",$accounts);
     }
 
@@ -53,7 +53,6 @@ class AccountController extends Controller
     public function show($id)
     {
         $account = Account::findOrFail($id);
-        $account = $account->load('transactions', 'user', 'accountUsers');
         return $this->returnResponse(true, "Account", $account);
     }
 
