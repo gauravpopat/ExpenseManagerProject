@@ -18,12 +18,9 @@ class TransactionController extends Controller
         $user = User::where('id', Auth()->user()->id)->get();
         $transactions = $user->load('transactions');
         if ($transactions) {
-            return response()->json([
-                'message'            => 'Transaction Record',
-                'transaction'        => $transactions,
-            ]);
+            return $this->returnResponse(true,"Transaction Record",$transactions);
         } else {
-            $this->returnResponse(false,"No Transaction Data!!");
+            return $this->returnResponse(false,"No Transaction Data!!");
         }
     }
 
@@ -38,11 +35,11 @@ class TransactionController extends Controller
             'account_user_id'       => 'required|numeric|exists:account_users,id',
             'account_id'            => 'required|numeric|exists:accounts,id'
         ]);
-
-        $this->ValidationErrorsResponse($validation);
+        if($validation->fails())
+            return $this->ValidationErrorsResponse($validation);
         //Insert
         Transaction::create($request->only(['type', 'category', 'amount', 'account_user_id', 'account_id']));
-        $this->returnResponse(true,"Inserted Successfully");
+        return $this->returnResponse(true,"Inserted Successfully");
     }
 
     //Update
@@ -56,10 +53,11 @@ class TransactionController extends Controller
             'amount'                => 'required|numeric'
         ]);
 
-        $this->ValidationErrorsResponse($validation);
+        if($validation->fails())
+            return $this->ValidationErrorsResponse($validation);
 
         Transaction::findOrFail($request->id)->update($request->only('type', 'category', 'amount'));
-        $this->returnResponse(true,"Data Updated Successfully");
+        return $this->returnResponse(true,"Data Updated Successfully");
     }
 
     //Get Record from ID
@@ -67,16 +65,13 @@ class TransactionController extends Controller
     {
         $transactions = Transaction::findOrFail($id);
         $transactions = $transactions->load('account', 'accountUsers');
-        return response()->json([
-            'message'           => 'Transactions Data',
-            'transactions'      => $transactions
-        ]);
+        return $this->returnResponse(true,"Transaction Data",$transactions);
     }
 
     //Delete record from transaction
     public function delete($id)
     {
         Transaction::findOrFail($id)->delete();
-        $this->returnResponse(true,"Transaction Deleted Successfully");
+        return $this->returnResponse(true,"Transaction Deleted Successfully");
     }
 }

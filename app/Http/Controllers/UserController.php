@@ -28,7 +28,8 @@ class UserController extends Controller
             'password_confirmation' => 'required'
         ]);
         
-        $this->ValidationErrorsResponse($validation);
+        if($validation->fails())
+            $this->ValidationErrorsResponse($validation);
 
         //Change Password
 
@@ -48,9 +49,6 @@ class UserController extends Controller
     {
         $user = User::where('id',Auth::id())->first();
         $user->load('accounts','usersOfAccounts');
-            return response()->json([
-                'message'           => 'User Profile',
-                'User Data'         => $user,
-            ]);
+        return $this->returnResponse(true,"User Profile",$user);
     }
 }

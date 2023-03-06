@@ -31,7 +31,8 @@ class AuthController extends Controller
             'password_confirmation' => 'required'
         ]);
 
-        $this->ValidationErrorsResponse($validation);
+        if($validation->fails())
+            return $this->ValidationErrorsResponse($validation);
 
         $user = User::create($request->only(['first_name', 'last_name', 'email', 'phone']) + [
             'password'                  => Hash::make($request->password),
@@ -53,11 +54,7 @@ class AuthController extends Controller
 
         //Response
         $apiToken = $user->createToken("API TOKEN")->plainTextToken;
-        return response()->json([
-            'status'    => true,
-            'message'   => 'User Created Successfully',
-            'token'     => $apiToken
-        ], 200);
+        return $this->returnResponse(true,"User Created Successfully",$apiToken);
     }
 
     public function login(Request $request)
@@ -69,7 +66,8 @@ class AuthController extends Controller
             // 'dummy'     => 'sometimes|required',
         ]);
 
-        $this->ValidationErrorsResponse($validation);
+        if($validation->fails())
+            return $this->ValidationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
 
@@ -79,13 +77,9 @@ class AuthController extends Controller
             // Checking user entered details
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                 $apiToken = $user->createToken("API TOKEN")->plainTextToken;
-                return response()->json([
-                    'status'    => true,
-                    'message'   => 'Login Successfully',
-                    'token'     => $apiToken
-                ], 200);
+                return $this->returnResponse(true,"Login Successfully",$apiToken);
             } else {
-                $this->returnResponse(false, "Password Incorrect");
+                return $this->returnResponse(false, "Password Incorrect");
             }
         }
     }
@@ -99,9 +93,9 @@ class AuthController extends Controller
                 'is_onboarded'      => true,
                 'email_verified_at' => now()
             ]);
-            $this->returnResponse(true, "Verification Successfull");
+            return $this->returnResponse(true, "Verification Successfull");
         } else {
-            $this->returnResponse(false, "User not found");
+            return $this->returnResponse(false, "User not found");
         }
     }
 
@@ -112,7 +106,8 @@ class AuthController extends Controller
             'email' => 'required|email|exists:users'
         ]);
 
-        $this->ValidationErrorsResponse($validation);
+        if($validation->fails())
+            return $this->ValidationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
 
@@ -127,9 +122,9 @@ class AuthController extends Controller
         $user['token'] = $token;
         
         if (Mail::to($user->email)->send(new ResetPassword($user))) {
-            $this->returnResponse(true,"Email Sent!");
+            return $this->returnResponse(true,"Email Sent!");
         } else {
-            $this->returnResponse(true,"Email Not Sent!");
+            return $this->returnResponse(true,"Email Not Sent!");
         }
     }
 
@@ -143,7 +138,8 @@ class AuthController extends Controller
             'token'                 => 'required|exists:password_resets,token'
         ]);
 
-        $this->ValidationErrorsResponse($validation);
+        if($validation->fails())
+            return $this->ValidationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
 
@@ -154,14 +150,14 @@ class AuthController extends Controller
                     'password' => Hash::make($request->password),
                 ]);
                 $passwordReset->delete();
-                $this->returnResponse(true,"Password Updated Successfully");
+                return $this->returnResponse(true,"Password Updated Successfully");
             }
             else{
-                $this->returnResponse(false,"Token Expired");
+                return $this->returnResponse(false,"Token Expired");
             }
         }
         else {
-            $this->returnResponse(false,"User not found!");
+           return $this->returnResponse(false,"User not found!");
         }
     }
     
