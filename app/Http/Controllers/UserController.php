@@ -14,26 +14,21 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Models\PasswordReset;
 use Illuminate\Http\Request;
+use App\Http\Traits\ValidationTrait;
 
 class UserController extends Controller
 {
+    use ValidationTrait;
     public function changePassword(Request $request)
     {
         //Validaton
-        $validate = Validator::make($request->all(), [
+        $validation = Validator::make($request->all(), [
             'old_password'          => 'required',
             'password'              => 'required|confirmed|min:8|max:40',
             'password_confirmation' => 'required'
         ]);
-        //Validation Error
-        if ($validate->fails()) {
-            $errors = $validate->errors();
-            return response()->json([
-                'status'    => false,
-                'message'   => 'Validation Error',
-                'error'     => $errors
-            ]);
-        }
+        
+        $this->ValidationErrorsResponse($validation);
 
         //Change Password
 

@@ -7,9 +7,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Account;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Traits\ValidationTrait;
 
 class AccountController extends Controller
 {
+    use ValidationTrait;
     public function list()
     {
         $accounts = User::findOrFail(auth()->user()->id)->load('accounts');
@@ -21,20 +23,13 @@ class AccountController extends Controller
 
     public function insert(Request $request)
     {
-        $validationForAccount = Validator::make($request->all(), [
+        $validation = Validator::make($request->all(), [
             'account_name'   => 'required|max:40|string',
             'account_number' => 'required|numeric|digits:12|unique:accounts,account_number',
             'user_id'        => 'numeric|required|exists:users,id'
         ]);
 
-        if ($validationForAccount->fails()) {
-            $errors = $validationForAccount->errors();
-            return response()->json([
-                'status'     => false,
-                'message'    => 'Validation Error',
-                'errors'     => $errors
-            ]);
-        }
+        $this->ValidationErrorsResponse($validation);
 
         $account = Account::create($request->only(['account_name', 'account_number', 'user_id']));
 
@@ -47,20 +42,13 @@ class AccountController extends Controller
 
     public function update(Request $request)
     {
-        $validationForAccount = Validator::make($request->all(), [
+        $validation = Validator::make($request->all(), [
             'id'             => 'required|exists:accounts,id',
             'account_name'   => 'required|max:40|string',
             'account_number' => 'required|numeric|digits:12|unique:accounts,account_number',
         ]);
 
-        if ($validationForAccount->fails()) {
-            $errors = $validationForAccount->errors();
-            return response()->json([
-                'status'    => false,
-                'message'   => 'Validation Error',
-                'error'     => $errors
-            ]);
-        }
+        $this->ValidationErrorsResponse($validation);
 
         Account::findOrFail($request->id)->update($request->only(['account_name', 'account_number']));
         return response()->json([

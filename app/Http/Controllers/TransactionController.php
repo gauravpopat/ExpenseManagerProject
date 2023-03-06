@@ -8,9 +8,11 @@ use Illuminate\Http\Request;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Traits\ValidationTrait;
 
 class TransactionController extends Controller
 {
+    use ValidationTrait;
     //Get list of Transaction Table Records
     public function list()
     {
@@ -32,7 +34,7 @@ class TransactionController extends Controller
     public function insert(Request $request)
     {
         //Validation
-        $validate = Validator::make($request->all(), [
+        $validation = Validator::make($request->all(), [
             'type'                  => 'required|in:income,expense',
             'category'              => 'required|max:40',
             'amount'                => 'required|numeric',
@@ -40,15 +42,7 @@ class TransactionController extends Controller
             'account_id'            => 'required|numeric|exists:accounts,id'
         ]);
 
-        //Validation Error
-        if ($validate->fails()) {
-            $errors = $validate->errors();
-            return response()->json([
-                'status'    => false,
-                'message'   => 'Validation Error',
-                'error'     => $errors
-            ]);
-        }
+        $this->ValidationErrorsResponse($validation);
 
         //Insert
         $transaction = Transaction::create($request->only(['type', 'category', 'amount', 'account_user_id', 'account_id']));
@@ -63,22 +57,14 @@ class TransactionController extends Controller
     public function update(Request $request)
     {
         //Validation
-        $validate = Validator::make($request->all(), [
+        $validation = Validator::make($request->all(), [
             'id'                    => 'required|exists:transactions,id',
             'type'                  => 'required|in:income,expense',
             'category'              => 'required|max:40',
             'amount'                => 'required|numeric'
         ]);
 
-        //Validation Error
-        if ($validate->fails()) {
-            $errors = $validate->errors();
-            return response()->json([
-                'status'    => false,
-                'message'   => 'Validation Error',
-                'error'     => $errors
-            ]);
-        }
+        $this->ValidationErrorsResponse($validation);
 
         $transaction = Transaction::findOrFail($request->id);
         $transaction->update($request->only('type', 'category', 'amount'));

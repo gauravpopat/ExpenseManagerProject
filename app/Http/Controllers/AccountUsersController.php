@@ -9,9 +9,11 @@ use App\Models\AccountUser;
 use App\Models\Account;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Traits\ValidationTrait;
 
 class AccountUsersController extends Controller
 {
+    use ValidationTrait;
     //Get list of Account_Users Table Records
     public function list()
     {
@@ -33,20 +35,12 @@ class AccountUsersController extends Controller
     public function insert(Request $request)
     {
         //Validation
-        $validate = Validator::make($request->all(), [
+        $validation = Validator::make($request->all(), [
             'email'                 => 'required|email|max:40|exists:users,email',
             'account_id'            => 'required|numeric|digits:12|exists:accounts,id'
         ]);
 
-        //Validation Error
-        if ($validate->fails()) {
-            $errors = $validate->errors();
-            return response()->json([
-                'status'    => false,
-                'message'   => 'Validation Error',
-                'error'     => $errors
-            ]);
-        }
+        $this->ValidationErrorsResponse($validation);
 
         //no need to add if($user) because of validation
         $user = User::where('email', $request->email)->first();
@@ -66,22 +60,15 @@ class AccountUsersController extends Controller
     // Account_Users Update
     public function update(Request $request)
     {
-        $validationForAccount = Validator::make($request->all(), [
+        $validation = Validator::make($request->all(), [
             'id'           => 'required|exists:account_users,id',
             'first_name'   => 'required|max:40|string',
             'last_name'    => 'required|max:40|string',
             'email'        => 'required|email|max:40|unique:account_users,email'
         ]);
 
-        //Validation Error
-        if ($validationForAccount->fails()) {
-            $errors = $validationForAccount->errors();
-            return response()->json([
-                'status'    => false,
-                'message'   => 'Validation Error',
-                'error'     => $errors
-            ]);
-        }
+        $this->ValidationErrorsResponse($validation);
+
         $user = AccountUser::findOrFail($request->id);
 
         $user->update($request->only(['first_name', 'last_name', 'email']));

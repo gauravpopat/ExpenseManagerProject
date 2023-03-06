@@ -14,14 +14,16 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Models\PasswordReset;
 use Illuminate\Http\Request;
+use App\Http\Traits\ValidationTrait;
 
 
 class AuthController extends Controller
 {
+    use ValidationTrait;
     public function create(Request $request)
     {
         //Validation
-        $validateUser = Validator::make($request->all(), [
+        $validation = Validator::make($request->all(), [
             'first_name'            => 'required|max:40|string',
             'last_name'             => 'required|max:40|string',
             'email'                 => 'required|max:40|email|unique:users,email',
@@ -30,14 +32,7 @@ class AuthController extends Controller
             'password_confirmation' => 'required'
         ]);
 
-        //Validation Error
-        if ($validateUser->fails()) {
-            $errors = $validateUser->errors();
-            return response()->json([
-                'message'   => 'Validation Error',
-                'error'     => $errors
-            ]);
-        }
+        $this->ValidationErrorsResponse($validation);
 
         $user = User::create($request->only(['first_name', 'last_name', 'email', 'phone']) + [
             'password'                  => Hash::make($request->password),
@@ -68,20 +63,13 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         //Validation
-        $validateUser   = Validator::make($request->all(), [
+        $validation   = Validator::make($request->all(), [
             'email'     => 'required|email|exists:users,email',
             'password'  => 'required',
             // 'dummy'     => 'sometimes|required',
         ]);
 
-        //Validation Error
-        if ($validateUser->fails()) {
-            $errors = $validateUser->errors();
-            return response()->json([
-                'message'   => 'Validation Error',
-                'error'     => $errors
-            ]);
-        }
+        $this->ValidationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
 
@@ -130,19 +118,11 @@ class AuthController extends Controller
     public function forgotPasswordLink(Request $request)
     {
         //Validation
-        $validate = Validator::make($request->all(), [
+        $validation = Validator::make($request->all(), [
             'email' => 'required|email|exists:users'
         ]);
 
-        //Validation Error
-        if ($validate->fails()) {
-            $errors = $validate->errors();
-            return response()->json([
-                'status'    => false,
-                'message'   => 'Validation Error',
-                'error'     => $errors
-            ]);
-        }
+        $this->ValidationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
         $token = Str::random(64);
@@ -168,22 +148,14 @@ class AuthController extends Controller
     public function forgotPassword(Request $request)
     {
         //Validation
-        $validate = Validator::make($request->all(), [
+        $validation = Validator::make($request->all(), [
             'email'                 => 'required|email|exists:password_resets,email',
             'password'              => 'required|confirmed|min:8|max:40',
             'password_confirmation' => 'required',
             'token'                 => 'required|exists:password_resets,token'
         ]);
 
-        //Validation Error
-        if ($validate->fails()) {
-            $errors = $validate->errors();
-            return response()->json([
-                'status'  => false,
-                'message' => 'Validation Error',
-                'error'   => $errors
-            ]);
-        }
+        $this->ValidationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
 
