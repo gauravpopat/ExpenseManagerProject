@@ -188,12 +188,12 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user) {
-            $expdate = PasswordReset::where('email',$request->email)->first();
-            if($expdate->expired_at > Carbon::now()){
+            $passwordReset = PasswordReset::where('email',$request->email)->first();
+            if($passwordReset->expired_at > Carbon::now()){
                 $user->update([
                     'password' => Hash::make($request->password),
                 ]);
-                PasswordReset::where('email',$request->email)->delete();
+                $passwordReset->delete();
                 return response()->json([
                     'status'  => true,
                     'message' => 'Password Updated Successfully.',

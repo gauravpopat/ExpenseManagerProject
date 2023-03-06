@@ -33,7 +33,7 @@ class AccountController extends Controller
                 'status'     => false,
                 'message'    => 'Validation Error',
                 'errors'     => $errors
-            ]);
+            ]); 
         }
 
         $account = Account::create($request->only(['account_name', 'account_number', 'user_id']));
@@ -44,7 +44,7 @@ class AccountController extends Controller
             'account'        => $account
         ], 200);
     }
-
+    
     public function update(Request $request)
     {
         $validationForAccount = Validator::make($request->all(), [
