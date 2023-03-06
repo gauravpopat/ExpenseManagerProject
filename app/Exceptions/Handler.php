@@ -3,11 +3,14 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use \Illuminate\Database\Eloquent\ModelNotFoundException as ModelNotFoundException;
 use Throwable;
+use Exception;
 
 class Handler extends ExceptionHandler
 {
-    /**
+
+   /**
      * A list of exception types with their corresponding custom log levels.
      *
      * @var array<class-string<\Throwable>, \Psr\Log\LogLevel::*>
@@ -47,4 +50,5 @@ class Handler extends ExceptionHandler
             //
         });
     }
+    
 }

@@ -54,10 +54,11 @@ class AccountController extends Controller
         ]);
 
         if ($validationForAccount->fails()) {
+            $errors = $validationForAccount->errors();
             return response()->json([
                 'status'    => false,
                 'message'   => 'Validation Error',
-                'error'     => $validationForAccount->errors()
+                'error'     => $errors
             ]);
         }
 
