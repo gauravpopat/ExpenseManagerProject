@@ -18,11 +18,11 @@ class AccountUser extends Model
 
     public function accounts()
     {
-        return $this->belongsTo(Account::class);
+        return $this->belongsTo(Account::class,'account_id');
     }
 
     public function transactions()
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasMany(Transaction::class,'account_user_id');
     }
 }
