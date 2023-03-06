@@ -82,7 +82,7 @@ class AccountUsersController extends Controller
                 'error'     => $errors
             ]);
         }
-        $user = AccountUser::find($request->id);
+        $user = AccountUser::findOrFail($request->id);
 
         $user->update($request->only(['first_name', 'last_name', 'email']));
         return response()->json([
@@ -93,35 +93,22 @@ class AccountUsersController extends Controller
     //Get Record from ID
     public function show($id)
     {
-        $accountUser = AccountUser::find($id);
-        if ($accountUser) {
-            $accountUser = $accountUser->load('account', 'transactions');
-            return response()->json([
-                'message'            => 'Account User Information',
-                'account users'      => $accountUser
-            ]);
-        } else {
-            return response()->json([
-                'message'   => 'Account user not found'
-            ]);
-        }
+        $accountUser = AccountUser::findOrFail($id);
+        $accountUser = $accountUser->load('account', 'transactions');
+        return response()->json([
+            'message'            => 'Account User Information',
+            'account users'      => $accountUser
+        ]);
     }
 
     // Account_Users Delete Record
     public function delete($id)
     {
-        $user = AccountUser::find($id);
-        if ($user) {
-            $user->delete();
-            return response()->json([
-                'status'  => true,
-                'message' => 'Account User deleted successfully',
-            ]);
-        } else {
-            return response()->json([
-                'status'  => false,
-                'message' => 'User not found'
-            ]);
-        }
+        $user = AccountUser::findOrFail($id);
+        $user->delete();
+        return response()->json([
+            'status'  => true,
+            'message' => 'Account User deleted successfully',
+        ]);
     }
 }

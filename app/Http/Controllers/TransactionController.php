@@ -80,7 +80,7 @@ class TransactionController extends Controller
             ]);
         }
 
-        $transaction = Transaction::find($request->id);
+        $transaction = Transaction::findOrFail($request->id);
         $transaction->update($request->only('type', 'category', 'amount'));
         return response()->json([
             'status'   => true,
@@ -91,35 +91,21 @@ class TransactionController extends Controller
     //Get Record from ID
     public function show($id)
     {
-        $transactions = Transaction::find($id);
-        if ($transactions) {
-            $transactions = $transactions->load('account', 'accountUsers');
-            return response()->json([
-                'message'           => 'Transactions Data',
-                'transactions'      => $transactions
-            ]);
-        } else {
-            return response()->json([
-                'message'   => 'Transaction Not Found'
-            ]);
-        }
+        $transactions = Transaction::findOrFail($id);
+        $transactions = $transactions->load('account', 'accountUsers');
+        return response()->json([
+            'message'           => 'Transactions Data',
+            'transactions'      => $transactions
+        ]);
     }
 
     //Delete record from transaction
     public function delete($id)
     {
-        $transaction = Transaction::find($id);
-        if ($transaction) {
-            $transaction->delete();
-            return response()->json([
-                'status'    => true,
-                'message'   => 'Transaction Deleted Successfully',
-            ]);
-        } else {
-            return response()->json([
-                'status'    => false,
-                'message'   => 'Transaction not found',
-            ]);
-        }
+        Transaction::findOrFail($id)->delete();
+        return response()->json([
+            'status'    => true,
+            'message'   => 'Transaction Deleted Successfully',
+        ]);
     }
 }

@@ -12,7 +12,7 @@ class AccountController extends Controller
 {
     public function list()
     {
-        $accounts = User::find(auth()->user()->id)->load('accounts');
+        $accounts = User::findOrFail(auth()->user()->id)->load('accounts');
         return response()->json([
             'message'   => 'Accounts',
             'accounts'  => $accounts
@@ -33,7 +33,7 @@ class AccountController extends Controller
                 'status'     => false,
                 'message'    => 'Validation Error',
                 'errors'     => $errors
-            ]); 
+            ]);
         }
 
         $account = Account::create($request->only(['account_name', 'account_number', 'user_id']));
@@ -44,7 +44,7 @@ class AccountController extends Controller
             'account'        => $account
         ], 200);
     }
-    
+
     public function update(Request $request)
     {
         $validationForAccount = Validator::make($request->all(), [
@@ -62,7 +62,7 @@ class AccountController extends Controller
             ]);
         }
 
-        Account::find($request->id)->update($request->only(['account_name', 'account_number']));
+        Account::findOrFail($request->id)->update($request->only(['account_name', 'account_number']));
         return response()->json([
             'status'    => true,
             'message'   => 'Record Updated Successfully',
@@ -71,40 +71,27 @@ class AccountController extends Controller
 
     public function show($id)
     {
-        $account = Account::find($id);
-        if ($account) {
-            $account = $account->load('transactions', 'user', 'accountUsers');
-            return response()->json([
-                'message'       => 'Account',
-                'account'       => $account
-            ]);
-        } else {
-            return response()->json([
-                'message'   => 'Account not found',
-            ]);
-        }
+        $account = Account::findOrFail($id);
+        $account = $account->load('transactions', 'user', 'accountUsers');
+        return response()->json([
+            'message'       => 'Account',
+            'account'       => $account
+        ]);
     }
 
     public function delete($id)
     {
-        $account = Account::find($id);
-        if ($account) {
-            if ($account->is_default == true) {
-                return response()->json([
-                    'status'    => false,
-                    'message'   => 'Deletation not allowed for default account'
-                ]);
-            } else {
-                $account->delete();
-                return response()->json([
-                    'status'    => true,
-                    'message'   => 'Account Deleted Successfully...'
-                ]);
-            }
-        } else {
+        $account = Account::findOrFail($id);
+        if ($account->is_default == true) {
             return response()->json([
                 'status'    => false,
-                'message'   => 'No Account Found'
+                'message'   => 'Deletation not allowed for default account'
+            ]);
+        } else {
+            $account->delete();
+            return response()->json([
+                'status'    => true,
+                'message'   => 'Account Deleted Successfully...'
             ]);
         }
     }
