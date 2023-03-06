@@ -52,10 +52,7 @@ class AuthController extends Controller
 
         //Welcome Mail
         Mail::to($user->email)->send(new WelcomeMail($user));
-
-        //Response
-        $apiToken = $user->createToken("API TOKEN")->plainTextToken;
-        return $this->returnResponse(true, "User Created Successfully", $apiToken);
+        return $this->returnResponse(true, "User Created Successfully");
     }
 
     public function login(Request $request)
