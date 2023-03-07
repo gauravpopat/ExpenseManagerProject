@@ -23,7 +23,7 @@ class UserController extends Controller
         ]);
         
         if($validation->fails())
-            return $this->ValidationErrorsResponse($validation);
+            return $this->validationErrorsResponse($validation);
 
         //Change Password
 

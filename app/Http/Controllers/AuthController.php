@@ -33,7 +33,7 @@ class AuthController extends Controller
         ]);
 
         if ($validation->fails())
-            return $this->ValidationErrorsResponse($validation);
+            return $this->validationErrorsResponse($validation);
 
         $user = User::create($request->only(['first_name', 'last_name', 'email', 'phone']) + [
             'password'                  => Hash::make($request->password),
@@ -65,7 +65,7 @@ class AuthController extends Controller
         ]);
 
         if ($validation->fails())
-            return $this->ValidationErrorsResponse($validation);
+            return $this->validationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
 
@@ -104,7 +104,7 @@ class AuthController extends Controller
         ]);
 
         if ($validation->fails())
-            return $this->ValidationErrorsResponse($validation);
+            return $this->validationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
 
@@ -136,7 +136,7 @@ class AuthController extends Controller
         ]);
 
         if ($validation->fails())
-            return $this->ValidationErrorsResponse($validation);
+            return $this->validationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
 

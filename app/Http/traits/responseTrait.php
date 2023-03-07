@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Traits;
 trait ResponseTrait {
-    public function ValidationErrorsResponse($validation) {
+    public function validationErrorsResponse($validation) {
             $errors = $validation->errors();
             return response()->json([
                 'status'     => false,

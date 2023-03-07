@@ -35,7 +35,7 @@ class TransactionController extends Controller
             'account_id'            => 'required|numeric|exists:accounts,id'
         ]);
         if ($validation->fails())
-            return $this->ValidationErrorsResponse($validation);
+            return $this->validationErrorsResponse($validation);
         //Insert
         Transaction::create($request->only(['type', 'category', 'amount', 'account_user_id', 'account_id']));
         return $this->returnResponse(true, "Inserted Successfully");
@@ -53,7 +53,7 @@ class TransactionController extends Controller
         ]);
 
         if ($validation->fails())
-            return $this->ValidationErrorsResponse($validation);
+            return $this->validationErrorsResponse($validation);
 
         Transaction::findOrFail($request->id)->update($request->only('type', 'category', 'amount'));
         return $this->returnResponse(true, "Data Updated Successfully");

@@ -26,7 +26,7 @@ class AccountController extends Controller
         ]);
 
         if ($validation->fails())
-            return $this->ValidationErrorsResponse($validation);
+            return $this->validationErrorsResponse($validation);
 
         Account::create($request->only(['account_name', 'account_number', 'user_id']));
 
@@ -42,7 +42,7 @@ class AccountController extends Controller
         ]);
 
         if($validation->fails())
-            return $this->ValidationErrorsResponse($validation);
+            return $this->validationErrorsResponse($validation);
 
         Account::findOrFail($request->id)->update($request->only(['account_name', 'account_number']));
 

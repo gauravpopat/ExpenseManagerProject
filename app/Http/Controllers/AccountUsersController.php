@@ -35,7 +35,7 @@ class AccountUsersController extends Controller
         ]);
 
         if($validation->fails())
-            return $this->ValidationErrorsResponse($validation);
+            return $this->validationErrorsResponse($validation);
 
         $user = User::where('email', $request->email)->first();
 
@@ -56,7 +56,7 @@ class AccountUsersController extends Controller
             'email'        => 'required|email|max:40|unique:account_users,email'
         ]);
         if($validation->fails())
-            return $this->ValidationErrorsResponse($validation);
+            return $this->validationErrorsResponse($validation);
 
         $user = AccountUser::findOrFail($request->id);
 
