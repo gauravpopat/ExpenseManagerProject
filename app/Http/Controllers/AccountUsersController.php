@@ -16,10 +16,10 @@ class AccountUsersController extends Controller
     
     public function list()
     {
-        $account = Account::where('user_id',auth()->user()->id)->first();
-        $accountUser = AccountUser::where('account_id', $account->id)->first();
-        if ($accountUser) {
-            $accountUser = $accountUser->load('transactions','accounts');
+        $account = Account::with('accountUsers')->where('user_id',auth()->user()->id)->first();
+        // $accountUser = AccountUser::where('account_id', $account->id)->first();
+        if ($account) {
+            $accountUser = $account->load('transactions','accountUsers');
             return $this->returnResponse(true, "Account Users Information",$accountUser);
         } else {
             return $this->returnResponse(false, "No Account Users Data Found");
@@ -30,6 +30,8 @@ class AccountUsersController extends Controller
     public function insert(Request $request)
     {
         $validation = Validator::make($request->all(), [
+            'first_name'            => 'required',
+            'last_name'             => 'required',
             'email'                 => 'required|email|max:40|exists:users,email',
             'account_id'            => 'required|numeric|digits:12|exists:accounts,id'
         ]);
@@ -37,12 +39,13 @@ class AccountUsersController extends Controller
         if($validation->fails())
             return $this->validationErrorsResponse($validation);
 
-        $user = User::where('email', $request->email)->first();
+        //$user = User::where('email', $request->email)->first();
 
-        AccountUser::create($request->only(['email', 'account_id']) + [
-            'first_name' => $user->first_name,
-            'last_name'  => $user->last_name
-        ]);
+        AccountUser::create($request->only(['email', 'account_id','first_name','last_name']));
+        // + [
+        //      'first_name' => $user->first_name,
+        //      'last_name'  => $user->last_name
+        // ]);
 
         return $this->returnResponse(true, "Account User Inserted Successfully...");
     }
