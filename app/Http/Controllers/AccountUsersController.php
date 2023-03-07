@@ -42,10 +42,11 @@ class AccountUsersController extends Controller
         //$user = User::where('email', $request->email)->first();
 
         AccountUser::create($request->only(['email', 'account_id','first_name','last_name']));
-        // + [
-        //      'first_name' => $user->first_name,
-        //      'last_name'  => $user->last_name
-        // ]);
+        
+        /* + [
+              'first_name' => $user->first_name,
+              'last_name'  => $user->last_name
+         ]); */
 
         return $this->returnResponse(true, "Account User Inserted Successfully...");
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
@@ -14,8 +15,7 @@ class TransactionController extends Controller
     use ResponseTrait;
     public function list()
     {
-        $user = User::where('id', auth()->user()->id)->get();
-        $transactions = $user->load('transactions','accountUsers','accounts');
+        $transactions = Account::with('transactions')->where('user_id', auth()->user()->id)->get();
         if ($transactions) {
             return $this->returnResponse(true, "Transaction Record", $transactions);
         } else {
