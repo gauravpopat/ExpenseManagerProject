@@ -33,7 +33,7 @@ class AccountUsersController extends Controller
             'first_name'            => 'required',
             'last_name'             => 'required',
             'email'                 => 'required|email|max:40|exists:users,email',
-            'account_id'            => 'required|numeric|digits:12|exists:accounts,id'
+            'account_id'            => 'required|numeric|exists:accounts,id'
         ]);
 
         if($validation->fails())
