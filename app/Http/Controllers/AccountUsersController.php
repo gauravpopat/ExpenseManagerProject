@@ -30,8 +30,8 @@ class AccountUsersController extends Controller
     public function insert(Request $request)
     {
         $validation = Validator::make($request->all(), [
-            'first_name'            => 'required',
-            'last_name'             => 'required',
+            'first_name'            => 'required|max:40|string',
+            'last_name'             => 'required|max:40|string',
             'email'                 => 'required|email|max:40|exists:users,email',
             'account_id'            => 'required|numeric|exists:accounts,id'
         ]);
